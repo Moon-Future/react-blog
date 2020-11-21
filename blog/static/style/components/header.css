@@ -1,0 +1,16 @@
+.header {
+  color: #fff;
+}
+
+.ant-menu {
+  text-align: center;
+  background: transparent;
+  border: none;
+  color: #f6448c;
+  font-size: 1rem;
+}
+
+.ant-menu-item:hover {
+  color:#3569d8 !important;
+  border-bottom-color:#3569d8 !important;
+}
