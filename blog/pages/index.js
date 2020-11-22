@@ -5,6 +5,7 @@ import Header from '../components/Header'
 import Author from '../components/Author'
 import BlogList from '../components/BlogList'
 import Poetry from '../components/Poetry'
+import KonvaImage from '../components/KonvaImage'
 import '../static/style/pages/index.css'
 
 const Home = () => (
@@ -12,6 +13,8 @@ const Home = () => (
     <Head>
       <title>MyBlog</title>
     </Head>
+
+    {/* <KonvaImage src={'../static/images/bg-1.jpg'}></KonvaImage> */}
 
     <Header />
 

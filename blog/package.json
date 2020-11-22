@@ -12,8 +12,12 @@
     "@zeit/next-sass": "^1.0.1",
     "antd": "^4.8.4",
     "babel-plugin-import": "^1.13.1",
+    "konva": "^7.1.9",
     "next": "10.0.2",
+    "node-sass": "^5.0.0",
     "react": "17.0.1",
-    "react-dom": "17.0.1"
+    "react-dom": "17.0.1",
+    "react-konva": "^17.0.0-0",
+    "use-image": "^1.0.6"
   }
 }
