@@ -1,0 +1,20 @@
+@import '../pages/variable.scss';
+
+.author-div {
+  text-align: center;
+  padding: 1rem;
+  background: linear-gradient(to bottom, #330200, #001419);
+}
+.author-div div {
+  margin-bottom: 1rem;
+}
+.author-introduction {
+  font-size: 0.8rem;
+  color: $cyber01;
+}
+.account {
+  margin-right: 10px;
+}
+.author-divide span {
+  color: #fff;
+}

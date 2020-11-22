@@ -7,4 +7,5 @@
   background-image: url(https://cl8023-1255423800.cos.ap-guangzhou.myqcloud.com/react/background/cyberpunk-01.png);
   background-size: cover;
   background-repeat: repeat;
+  overflow: auto;
 }

@@ -1,0 +1,37 @@
+@import '../pages/variable.scss';
+
+.header {
+  color: $cyber06;
+}
+
+.header-bg {
+  position: absolute;
+  height: 47px;
+  width: 100%;
+  background: linear-gradient(to right, #330200, #001419);
+  opacity: 0.3;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-txt {
+  color: $cyber07;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.ant-menu {
+  text-align: center;
+  background: transparent;
+  border: none;
+  color: $cyber06;
+  font-size: 1rem;
+}
+
+.ant-menu-item:hover {
+  color: $cyber07 !important;
+  border-bottom-color: $cyber07 !important;
+}
