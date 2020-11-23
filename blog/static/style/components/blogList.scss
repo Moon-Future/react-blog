@@ -7,6 +7,10 @@
   font-size: 1.3rem;
   color: $cyber06;
   padding: 0 0.5rem;
+  cursor: pointer;
+  &:hover {
+    color: $cyber07;
+  }
 }
 .list-context {
   color: #fff;

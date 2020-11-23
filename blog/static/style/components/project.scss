@@ -1,0 +1,29 @@
+@import '../pages/variable.scss';
+
+.project-div {
+  text-align: center;
+  padding: 1rem;
+  background: linear-gradient(to bottom, #330200, #001419);
+  border: 1px solid $cyber02;
+}
+.project-item {
+  display: flex;
+  text-align: left;
+  margin-bottom: 20px;
+}
+.project-item:last-child {
+  margin-bottom: 0;
+}
+.projec-txt {
+  margin-left: 5px;
+}
+.project-title {
+  color: $cyber02;
+  padding: 0;
+  margin: 0;
+}
+.project-descr {
+  color: $cyber01;
+  padding: 0;
+  margin: 0
+}

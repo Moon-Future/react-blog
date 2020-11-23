@@ -4,6 +4,7 @@
   text-align: center;
   padding: 1rem;
   background: linear-gradient(to bottom, #330200, #001419);
+  border: 1px solid $cyber02;
 }
 .author-div div {
   margin-bottom: 1rem;
@@ -17,4 +18,14 @@
 }
 .author-divide span {
   color: #fff;
+}
+.author-avatar:hover {
+  transform: rotate(666turn);
+  transition-property: all;
+  transition-duration: 59s;
+  transition-timing-function: cubic-bezier(0.34, 0, 0.84, 1);
+  transition-delay: 1s;
+}
+.author-social {
+  cursor: pointer;
 }

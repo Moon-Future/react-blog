@@ -4,7 +4,7 @@ import Head from 'next/head'
 import Header from '../components/Header'
 import Author from '../components/Author'
 import Project from '../components/Project'
-import BlogList from '../components/BlogList'
+import BlogContent from '../components/BlogContent'
 import Poetry from '../components/Poetry'
 import KonvaImage from '../components/KonvaImage'
 import '../static/style/pages/index.css'
@@ -14,8 +14,6 @@ const Home = () => (
     <Head>
       <title>MyBlog</title>
     </Head>
-
-    {/* <KonvaImage src={'../static/images/bg-1.jpg'}></KonvaImage> */}
 
     <Header />
 
@@ -28,7 +26,7 @@ const Home = () => (
       <Col className="comm-center" xs={24} sm={24} md={24} lg={16} xl={14} xxl={12}>
         <div className="comm-center-bg"></div>
         <div className="comm-center-content">
-          <BlogList />
+          <BlogContent />
         </div>
       </Col>
 

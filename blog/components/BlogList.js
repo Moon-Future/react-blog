@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
-import { List, Icon, Breadcrumb, Image, Tag } from 'antd'
+import Link from 'next/link'
+import { List, Breadcrumb, Image, Tag } from 'antd'
 import '../static/style/components/blogList.scss'
+import { CalendarTwoTone, EyeTwoTone } from '@ant-design/icons'
 
 const BlogList = () => {
   const [mylist, setMylist] = useState([
@@ -27,13 +29,13 @@ const BlogList = () => {
   ])
 
   return (
-    <div>
+    <>
       <div className="bread-div">
         <Breadcrumb>
           <Breadcrumb.Item>
-            <a href="/">首页</a>
+            <Link href="/">首页</Link>
           </Breadcrumb.Item>
-          <Breadcrumb.Item>视频列表</Breadcrumb.Item>
+          <Breadcrumb.Item>文章列表</Breadcrumb.Item>
         </Breadcrumb>
       </div>
 
@@ -42,33 +44,39 @@ const BlogList = () => {
         dataSource={mylist}
         renderItem={(item) => (
           <List.Item>
-            <div className="list-title">{item.title}</div>
+            <Link href="/detailed?id=2">
+              <div className="list-title">{item.title}</div>
+            </Link>
             <div className="list-icon">
               <span>
-                <Icon type="calendar" /> 2019-06-28
+                <CalendarTwoTone />
+                2019-06-28
               </span>
               <span>
                 <Tag color="#02be6e">Vue</Tag>
                 <Tag color="#00f4ff">React</Tag>
               </span>
               <span>
-                <Icon type="fire" /> 5498人
+                <EyeTwoTone />
+                5498人
               </span>
             </div>
-            <div className="list-cover">
-              <h2 className="blog-title">{item.title}</h2>
-              <Image
-                className="blog-cover"
-                width={'100%'}
-                preview={false}
-                src="https://cdn.pixabay.com/photo/2020/05/06/00/15/cyberpunk-5135622__480.jpg"
-              />
-            </div>
+            <Link href="/detailed?id=2">
+              <div className="list-cover">
+                <h2 className="blog-title">{item.title}</h2>
+                <Image
+                  className="blog-cover"
+                  width={'100%'}
+                  preview={false}
+                  src="https://cdn.pixabay.com/photo/2020/05/06/00/15/cyberpunk-5135622__480.jpg"
+                />
+              </div>
+            </Link>
             <div className="list-context">{item.context}</div>
           </List.Item>
         )}
       />
-    </div>
+    </>
   )
 }
 

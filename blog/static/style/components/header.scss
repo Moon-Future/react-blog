@@ -31,7 +31,7 @@
   font-size: 1rem;
 }
 
-.ant-menu-item:hover {
+.ant-menu-item:hover, .ant-menu-item-selected {
   color: $cyber07 !important;
   border-bottom-color: $cyber07 !important;
 }

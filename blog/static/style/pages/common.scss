@@ -18,10 +18,7 @@ a {
 }
 
 .comm-left {
-  background-color: #fff;
-  /* padding: 0.3rem; */
   border-radius: 0.3rem;
-  border: 1px solid $cyber02;
   height: 100%;
 }
 .comm-center {
@@ -46,6 +43,7 @@ a {
   background-color: #fff;
   padding: 0.3rem;
   border-radius: 0.3rem;
+  margin-bottom: 20px;
 }
 .comm-main {
   margin-top: 0.5rem;
@@ -58,5 +56,8 @@ a {
   color: #fff;
 }
 .ant-breadcrumb-link {
+  color: $cyber07;
+}
+.ant-breadcrumb-link a:hover {
   color: $cyber07;
 }
