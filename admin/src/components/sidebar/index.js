@@ -1,5 +1,5 @@
 import './index.scss'
-import { Menu } from 'antd'
+import { Menu, Avatar } from 'antd'
 import { Link } from 'react-router-dom'
 // import {
 //   AppstoreOutlined,
@@ -13,11 +13,23 @@ import { Link } from 'react-router-dom'
 
 const { SubMenu } = Menu
 
-const menuList = [{ title: '首页', url: '/' }, { title: '文章管理', children: [{ title: '文章列表', url: '/articleList' }, { title: '新增文章', url: '/' }] }]
+const menuList = [
+  { title: '首页', url: '/' },
+  {
+    title: '文章管理',
+    children: [
+      { title: '文章列表', url: '/articleList' },
+      { title: '新增文章', url: '/addArticle' },
+    ],
+  },
+]
 
 export default () => {
   return (
     <div className="sidebar">
+      <div className="logo">
+        <Avatar size={100} src={require('../../static/image/avatar.jpg').default} />
+      </div>
       <Menu defaultSelectedKeys={['0']} mode="inline" theme="dark">
         {menuList.map((ele, index) => {
           return ele.children ? (
