@@ -22,9 +22,10 @@ const menuList = [
       { title: '新增文章', url: '/addArticle' },
     ],
   },
+  { title: '文章标签', url: '/tag' }
 ]
 
-export default () => {
+export default function SideBar() {
   return (
     <div className="sidebar">
       <div className="logo">

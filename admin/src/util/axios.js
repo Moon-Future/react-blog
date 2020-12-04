@@ -18,12 +18,12 @@ const toLogin = () => {
  * 请求失败后的错误统一处理
  * @param {Number} status 请求失败的状态码
  */
-const errorHandle = (status, message) => {
+const errorHandle = (status, msg) => {
   // 状态码判断
   switch (status) {
     // 400
     case 400:
-      message.error(message)
+      message.error(msg)
       break
     // 401: 未登录状态，跳转登录页
     case 401:
@@ -47,7 +47,7 @@ const errorHandle = (status, message) => {
       message.error('服务器开小差啦😅', 'error')
       break
     default:
-      console.log(message)
+      console.log(msg)
   }
 }
 

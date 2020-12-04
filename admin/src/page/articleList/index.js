@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Breadcrumb, Table, Space } from 'antd'
+import { Breadcrumb, Table, Space, Button, Tag } from 'antd'
 import { Link } from 'react-router-dom'
 import axios from '../../util/axios'
 import API from '../../config/api'
@@ -19,6 +19,11 @@ class ArticleList extends Component {
       {
         title: '标签',
         dataIndex: 'tag',
+        render: (text, record) => (
+          text.map(ele => {
+            return <Tag key={ele.id}>{ele.name}</Tag>
+          })
+        )
       },
       {
         title: '创建时间',
@@ -37,12 +42,23 @@ class ArticleList extends Component {
         dataIndex: 'user_id',
       },
       {
+        title: '状态',
+        dataIndex: 'state',
+        render: (text, record) => {
+          if (text === 0) {
+            return <Tag color='#2db7f5'>暂存搞</Tag>
+          } else {
+            return <Tag color='#87d068'>已发布</Tag>
+          }
+        },
+      },
+      {
         title: '操作',
         key: 'action',
         render: (text, record) => (
           <Space size="middle">
-            <a href="/">更新</a>
-            <a href="/">删除</a>
+            <Link to={`/addArticle?id=${record.id}`}>更新</Link>
+            <Button type="link" danger onClick={this.delArticle}>删除</Button>
           </Space>
         ),
       },
@@ -50,7 +66,7 @@ class ArticleList extends Component {
   }
 
   componentDidMount() {
-    axios.get(API.getArticle).then((res) => {
+    axios.post(API.getArticleList).then((res) => {
       let data = res.data
       data.forEach((ele) => {
         ele.add_time = formatTime(ele.add_time, 'yyyy-MM-dd hh:mm')
@@ -60,6 +76,10 @@ class ArticleList extends Component {
         articleList: res.data,
       })
     })
+  }
+
+  delArticle = () => {
+    console.log(this)
   }
 
   render() {

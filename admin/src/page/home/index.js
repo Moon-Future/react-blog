@@ -6,14 +6,11 @@ import SideBar from '../../components/sidebar'
 import Welcome from '../welcome'
 import ArticleList from '../articleList'
 import AddArticle from '../addArticle'
+import Tag from '../tag'
 
 const { Header, Sider, Content } = Layout
 
 class Home extends Component {
-  constructor(props) {
-    super(props)
-  }
-
   render() {
     return (
       <>
@@ -27,6 +24,7 @@ class Home extends Component {
               <Switch>
                 <Route path="/articleList" component={ArticleList} />
                 <Route path="/addArticle" component={AddArticle} />
+                <Route path="/tag" component={Tag} />
                 <Route path="/" component={Welcome} />
               </Switch>
             </Content>

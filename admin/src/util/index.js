@@ -18,3 +18,12 @@ export function formatTime(date, format) {
   }
   return format
 }
+
+export function getUrlParam(url, name) {
+  const reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)')
+  const r = url.substr(1).match(reg)
+  if (r != null) {
+      return r[2]
+  }
+  return ''
+}

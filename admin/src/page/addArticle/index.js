@@ -1,17 +1,19 @@
 import React, { Component } from 'react'
 import { Breadcrumb, Input, Row, Col, Button, Image, Tag, DatePicker, message } from 'antd'
+import moment from 'moment'
 import { Link } from 'react-router-dom'
 import './index.scss'
 import marked from 'marked'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/monokai-sublime.css'
-import { PlusOutlined } from '@ant-design/icons'
 import axios from '../../util/axios'
+import { getUrlParam } from '../../util/index'
 import API from '../../config/api'
 
 class AddArticle extends Component {
   constructor(props) {
     super(props)
+    this.articleId = getUrlParam(props.location.search, 'id')
     this.state = {
       title: '',
       content: '',
@@ -20,15 +22,13 @@ class AddArticle extends Component {
       coverSrc: '',
       defaultSrc: 'https://cdn.pixabay.com/photo/2020/05/06/00/15/cyberpunk-5135622__480.jpg',
       tags: [],
-      tagInputVisible: false,
-      tagValue: '',
       addTime: '',
       updTime: '',
       loading: false,
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     // markd 配置
     const renderer = new marked.Renderer()
     marked.setOptions({
@@ -46,11 +46,32 @@ class AddArticle extends Component {
         return hljs.highlightAuto(code).value
       },
     })
+    if (this.articleId) {
+      const { data } = await axios.post(API.getArticle, { id: this.articleId, allTag: true })
+      this.setState({
+        title: data.title,
+        content: data.mdContent,
+        html: marked(data.mdContent),
+        summary: data.summary,
+        coverSrc: data.cover,
+        tags: data.tag || [],
+        addTime: moment(new Date(data.add_time)),
+        updTime: moment()
+      })
+    } else {
+      this.getTagList()
+    }
   }
 
   inputValue(e, field) {
     this.setState({
       [field]: e.target.value.trim(),
+    })
+  }
+
+  getTagList() {
+    axios.post(API.getTagList).then(res => {
+      this.setState({ tags: res.data })
     })
   }
 
@@ -75,61 +96,34 @@ class AddArticle extends Component {
     })
   }
 
-  // 删除标签
-  handleClose = (removedTag) => {
-    const tags = this.state.tags.filter((tag) => tag !== removedTag)
+  // 选择标签
+  selectTag(tag) {
+    const { tags } = this.state
+    for (let i = 0, len = tags.length; i < len; i++) {
+      if (tags[i].id === tag.id) {
+        tags[i].selected = !tags[i].selected
+        break
+      }
+    }
     this.setState({ tags })
   }
 
-  // 显示新增标签输入框
-  showInput = () => {
-    this.setState({ tagInputVisible: true }, () => this.input.focus())
-  }
-
-  // 新增标签query
-  handleInputConfirm = () => {
-    const { tagValue } = this.state
-    let { tags } = this.state
-    if (tagValue && tags.indexOf(tagValue) === -1) {
-      tags = [...tags, tagValue]
-    }
-    this.setState({
-      tags,
-      tagInputVisible: false,
-      tagValue: '',
-    })
-  }
-
-  // 循环tags数据
-  forMap = (tag) => {
-    const tagElem = (
-      <Tag
-        closable
-        onClose={(e) => {
-          e.preventDefault()
-          this.handleClose(tag)
-        }}
-      >
-        {tag}
-      </Tag>
-    )
-    return (
-      <span key={tag} style={{ display: 'inline-block', marginBottom: '5px' }}>
-        {tagElem}
-      </span>
-    )
-  }
 
   changeDate(field, moment, dateStr) {
     this.setState({
       [field]: moment,
     })
-    console.log(this, field, moment, dateStr)
   }
 
   async submit(flag = true) {
     if (this.state.loading) return
-    const { title, content, summary, coverSrc, tags } = this.state
+    const { title, content, summary, coverSrc, tags, addTime, updTime } = this.state
+    const selectedTag = []
+    tags.forEach((ele) => {
+      if (ele.selected) {
+        selectedTag.push(ele.id)
+      }
+    })
     if (title === '') {
       message.info('请输入标题')
       return
@@ -151,26 +145,37 @@ class AddArticle extends Component {
         content,
         summary,
         coverSrc,
-        tags,
+        tags: selectedTag,
+        addTime: addTime && addTime.valueOf(),
+        updTime: updTime && updTime.valueOf(),
         flag,
+        id: this.articleId
       })
+      if (this.articleId) {
+        this.props.history.goBack()
+        return
+      }
       this.setState({
         title: '',
         content: '',
         html: '',
         summary: '',
         coverSrc: '',
-        tags: [],
+        addTime: '',
+        uodTIme: '',
         tagInputVisible: false,
         tagValue: '',
         loading: false,
       })
-    } catch (e) {}
+    } catch (e) {
+      this.setState({
+        loading: false,
+      })
+    }
   }
 
   render() {
-    const { title, content, html, coverSrc, defaultSrc, tags, tagInputVisible, tagValue, summary, loading, addTime, updTime } = this.state
-    const tagChild = tags.map(this.forMap)
+    const { title, content, html, coverSrc, defaultSrc, tags, summary, loading, addTime, updTime } = this.state
     return (
       <>
         <Breadcrumb className="bread-crumb">
@@ -184,10 +189,10 @@ class AddArticle extends Component {
           <Row style={{ height: '100%' }}>
             <Col span={18} style={{ height: '100%' }}>
               <div className="article-title">
-                <span className="artilce-label">标题</span>
+                <span className="article-label">标题</span>
                 <Input style={{ width: '50%' }} value={title} placeholder="请输入文章标题" onChange={(e) => this.inputValue(e, 'title')} />
               </div>
-              <p className="artilce-label">正文</p>
+              <p className="article-label">正文</p>
               <div className="article-editor">
                 <Input.TextArea className="article-md" value={content} style={{ width: '50%', height: '80%' }} onChange={(e) => this.mdContent(e)} />
                 <div className="markdown-content" dangerouslySetInnerHTML={{ __html: html }}></div>
@@ -209,27 +214,20 @@ class AddArticle extends Component {
                 <Image className="blog-cover" width={'100%'} src={coverSrc || defaultSrc} onError={(e) => this.imgError(e)} />
               </div>
               <div className="marginb">
-                <p>标签：</p>
-                {tagChild}
-                {tagInputVisible && (
-                  <Input
-                    ref={(ele) => {
-                      this.input = ele
-                    }}
-                    type="text"
-                    size="small"
-                    style={{ width: 78 }}
-                    value={tagValue}
-                    onChange={(e) => this.inputValue(e, 'tagValue')}
-                    onBlur={this.handleInputConfirm}
-                    onPressEnter={this.handleInputConfirm}
-                  />
-                )}
-                {!tagInputVisible && (
-                  <Tag onClick={() => this.showInput()} className="site-tag-plus">
-                    <PlusOutlined /> New Tag
-                  </Tag>
-                )}
+                <p>
+                  选择标签：
+                  {tags.length ? (
+                    tags.map((ele) => {
+                      return (
+                        <Tag color={ ele.selected ? '#2db7f5' : '' } key={ele.name} onClick={() => this.selectTag(ele)}>
+                          {ele.name}
+                        </Tag>
+                      )
+                    })
+                  ) : (
+                    <span>暂无标签</span>
+                  )}
+                </p>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <DatePicker
