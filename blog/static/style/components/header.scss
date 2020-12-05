@@ -1,15 +1,26 @@
-@import '../pages/variable.scss';
+@import '/static/style/variable.scss';
 
 .header {
-  color: $cyber06;
+  color: $white;
+  height: 80px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  z-index: 100;
 }
 
 .header-bg {
   position: absolute;
-  height: 47px;
+  height: 80px;
   width: 100%;
-  background: linear-gradient(to right, #330200, #001419);
-  opacity: 0.3;
+  background: $black;
+  opacity: 0.8;
+}
+
+.header-row {
+  width: 100%;
 }
 
 .header-left {
@@ -18,20 +29,21 @@
 }
 
 .header-txt {
-  color: $cyber07;
+  color: $white;
   font-weight: bold;
-  font-size: 1.5rem;
+  font-size: 2rem;
 }
 
 .ant-menu {
   text-align: center;
   background: transparent;
   border: none;
-  color: $cyber06;
+  color: $white;
   font-size: 1rem;
 }
 
-.ant-menu-item:hover, .ant-menu-item-selected {
-  color: $cyber07 !important;
-  border-bottom-color: $cyber07 !important;
+.ant-menu-item:hover,
+.ant-menu-item-selected {
+  color: $yellow !important;
+  border-bottom-color: $yellow !important;
 }

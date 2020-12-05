@@ -1,13 +1,14 @@
-@import '../pages/variable.scss';
+@import '/static/style/variable.scss';
 
 .project-div {
   text-align: center;
   padding: 1rem;
-  background: linear-gradient(to bottom, #330200, #001419);
-  border: 1px solid $cyber02;
+  // background: linear-gradient(to bottom, #330200, #001419);
+  // border: 1px solid $cyber02;
 }
 .project-item {
   display: flex;
+  align-items: center;
   text-align: left;
   margin-bottom: 20px;
 }
@@ -18,12 +19,13 @@
   margin-left: 5px;
 }
 .project-title {
-  color: $cyber02;
+  font-size: 1rem;
+  color: $black;
   padding: 0;
   margin: 0;
 }
 .project-descr {
   color: $cyber01;
   padding: 0;
-  margin: 0
+  margin: 0;
 }

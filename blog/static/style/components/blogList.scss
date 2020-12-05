@@ -1,24 +1,24 @@
-@import '../pages/variable.scss';
+@import '/static/style/variable.scss';
 
 .bread-div {
   padding: 8px;
 }
 .list-title {
   font-size: 1.3rem;
-  color: $cyber06;
   padding: 0 0.5rem;
   cursor: pointer;
+  display: inline-block;
   &:hover {
-    color: $cyber07;
+    color: $origin;
   }
 }
 .list-context {
-  color: #fff;
+  font-size: 16px;
   padding: 0.5rem;
 }
 .list-icon {
   padding: 0.5rem 0;
-  color: #aaa;
+  color: $black;
 }
 .list-icon span {
   display: inline-block;
@@ -47,7 +47,7 @@
   }
 }
 .blog-title {
-  color: $cyber07;
+  color: $white;
   position: absolute;
   z-index: 10;
   font-size: 2rem;

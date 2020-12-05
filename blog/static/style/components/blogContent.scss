@@ -1,9 +1,5 @@
-@import '../pages/variable.scss';
+@import '/static/style/variable.scss';
 
 .markdown-content {
-  padding: 10px;
-  color: $cyber02;
-}
-.markdown-content h1, .markdown-content h2, .markdown-content h3, .markdown-content h4 {
-  color: $cyber01;
+  padding: 20px;
 }

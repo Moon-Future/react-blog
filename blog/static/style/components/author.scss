@@ -1,23 +1,23 @@
-@import '../pages/variable.scss';
+@import '/static/style/variable.scss';
 
 .author-div {
   text-align: center;
   padding: 1rem;
-  background: linear-gradient(to bottom, #330200, #001419);
-  border: 1px solid $cyber02;
+  // background: linear-gradient(to bottom, #330200, #001419);
+  // border: 1px solid $black;
 }
 .author-div div {
   margin-bottom: 1rem;
 }
 .author-introduction {
   font-size: 0.8rem;
-  color: $cyber01;
+  color: $red;
 }
 .account {
   margin-right: 10px;
 }
 .author-divide span {
-  color: #fff;
+  color: $black;
 }
 .author-avatar:hover {
   transform: rotate(666turn);

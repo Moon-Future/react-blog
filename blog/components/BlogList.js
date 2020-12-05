@@ -30,14 +30,14 @@ const BlogList = () => {
 
   return (
     <>
-      <div className="bread-div">
+      {/* <div className="bread-div">
         <Breadcrumb>
           <Breadcrumb.Item>
             <Link href="/">首页</Link>
           </Breadcrumb.Item>
           <Breadcrumb.Item>文章列表</Breadcrumb.Item>
         </Breadcrumb>
-      </div>
+      </div> */}
 
       <List
         itemLayout="vertical"

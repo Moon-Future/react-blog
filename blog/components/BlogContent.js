@@ -62,7 +62,7 @@ const BlogContent = () => {
 
   return (
     <>
-      <div className="bread-div">
+      {/* <div className="bread-div">
         <Breadcrumb>
           <Breadcrumb.Item>
             <Link href="/">首页</Link>
@@ -72,7 +72,7 @@ const BlogContent = () => {
           </Breadcrumb.Item>
           <Breadcrumb.Item>大大撒旦</Breadcrumb.Item>
         </Breadcrumb>
-      </div>
+      </div> */}
 
       <div className="markdown-content" dangerouslySetInnerHTML={{ __html: marked(content) }}></div>
     </>
