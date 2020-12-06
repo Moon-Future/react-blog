@@ -4,7 +4,7 @@
   padding: 8px;
 }
 .list-title {
-  font-size: 1.3rem;
+  font-size: 2rem;
   padding: 0 0.5rem;
   cursor: pointer;
   display: inline-block;
@@ -12,7 +12,7 @@
     color: $origin;
   }
 }
-.list-context {
+.list-summary {
   font-size: 16px;
   padding: 0.5rem;
 }
@@ -37,7 +37,7 @@
 }
 .blog-cover {
   height: 300px;
-  border: 10px solid #1c0a0b;
+  // border: 10px solid #1c0a0b;
   overflow: hidden;
   cursor: pointer;
   img {
