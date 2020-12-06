@@ -7,21 +7,23 @@ class TagController extends Controller {
     const { all } = this.ctx.request.body
     const param = all ? {} : { off: 0 }
     const result = await this.app.mysql.select('tag', {
-      where: param
+      where: param,
     })
     this.ctx.body = result
   }
-  
+
   async addTag() {
-    const { id, name } = this.ctx.request.body
+    const { id, name, color, background } = this.ctx.request.body
     const count = await this.app.mysql.count('tag')
     let request
     if (id) {
-      request = await this.app.mysql.update('tag', { id, name })
+      request = await this.app.mysql.update('tag', { id, name, color, background })
     } else {
       request = await this.app.mysql.insert('tag', {
         id: count + 1,
-        name
+        name,
+        color,
+        background,
       })
     }
     if (request.affectedRows === 1) {

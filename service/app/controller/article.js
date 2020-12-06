@@ -14,12 +14,12 @@ class ArticleController extends Controller {
   async getArticleList() {
     const result = await this.app.mysql.select('article')
     const tagAll = await this.app.mysql.select('tag')
-    result.forEach(item => {
+    result.forEach((item) => {
       const tagSplit = item.tag.split(',')
       const tag = []
-      tagAll.forEach(ele => {
+      tagAll.forEach((ele) => {
         if (tagSplit.includes(ele.id + '')) {
-          tag.push({ id: ele.id, name: ele.name })
+          tag.push({ id: ele.id, name: ele.name, color: ele.color, background: ele.background })
         }
       })
       item.tag = tag
@@ -35,10 +35,10 @@ class ArticleController extends Controller {
       const tagSplit = result.tag.split(',')
       const tag = []
       const tagAll = await this.app.mysql.select('tag', {
-        where: { off: 0 }
+        where: { off: 0 },
       })
-      tagAll.forEach(ele => {
-        const obj = { id: ele.id, name: ele.name }
+      tagAll.forEach((ele) => {
+        const obj = { id: ele.id, name: ele.name, color: ele.color, background: ele.background }
         if (tagSplit.includes(ele.id + '')) {
           if (allTag) {
             obj.selected = true
