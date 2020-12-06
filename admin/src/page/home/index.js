@@ -12,11 +12,12 @@ const { Header, Sider, Content } = Layout
 
 class Home extends Component {
   render() {
+    const { location } = this.props
     return (
       <>
         <Layout className="container">
           <Sider>
-            <SideBar />
+            <SideBar pathname={location.pathname} />
           </Sider>
           <Layout>
             <Header className="header">Header</Header>

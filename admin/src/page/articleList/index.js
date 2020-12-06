@@ -19,11 +19,14 @@ class ArticleList extends Component {
       {
         title: '标签',
         dataIndex: 'tag',
-        render: (text, record) => (
-          text.map(ele => {
-            return <Tag key={ele.id}>{ele.name}</Tag>
-          })
-        )
+        render: (text, record) =>
+          text.map((ele) => {
+            return (
+              <Tag color={ele.background} style={{ color: ele.color }} key={ele.id}>
+                {ele.name}
+              </Tag>
+            )
+          }),
       },
       {
         title: '创建时间',
@@ -46,9 +49,9 @@ class ArticleList extends Component {
         dataIndex: 'state',
         render: (text, record) => {
           if (text === 0) {
-            return <Tag color='#2db7f5'>暂存搞</Tag>
+            return <Tag color="#2db7f5">暂存搞</Tag>
           } else {
-            return <Tag color='#87d068'>已发布</Tag>
+            return <Tag color="#87d068">已发布</Tag>
           }
         },
       },
@@ -58,7 +61,9 @@ class ArticleList extends Component {
         render: (text, record) => (
           <Space size="middle">
             <Link to={`/addArticle?id=${record.id}`}>更新</Link>
-            <Button type="link" danger onClick={this.delArticle}>删除</Button>
+            <Button type="link" danger onClick={this.delArticle}>
+              删除
+            </Button>
           </Space>
         ),
       },

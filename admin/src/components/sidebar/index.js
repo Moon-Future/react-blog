@@ -22,29 +22,30 @@ const menuList = [
       { title: '新增文章', url: '/addArticle' },
     ],
   },
-  { title: '文章标签', url: '/tag' }
+  { title: '文章标签', url: '/tag' },
 ]
 
-export default function SideBar() {
+export default function SideBar(props) {
+  const { pathname } = props
   return (
     <div className="sidebar">
       <div className="logo">
         <Avatar size={100} src={require('../../static/image/avatar.jpg').default} />
       </div>
-      <Menu defaultSelectedKeys={['0']} mode="inline" theme="dark">
+      <Menu defaultSelectedKeys={['/']} selectedKeys={[pathname]} mode="inline" theme="dark">
         {menuList.map((ele, index) => {
           return ele.children ? (
             <SubMenu key={index} title={ele.title}>
               {ele.children.map((v, k) => {
                 return (
-                  <Menu.Item key={index + '_sub_' + k}>
+                  <Menu.Item key={v.url}>
                     <Link to={v.url}>{v.title}</Link>
                   </Menu.Item>
                 )
               })}
             </SubMenu>
           ) : (
-            <Menu.Item key={index}>
+            <Menu.Item key={ele.url}>
               <Link to={ele.url}>{ele.title}</Link>
             </Menu.Item>
           )

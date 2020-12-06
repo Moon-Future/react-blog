@@ -1,19 +1,21 @@
 import React, { Component } from 'react'
-import { Breadcrumb, Table, Space, Button, Modal, Input  } from 'antd'
+import { Breadcrumb, Table, Space, Button, Modal, Input, Tag } from 'antd'
 import { Link } from 'react-router-dom'
 import axios from '../../util/axios'
 import API from '../../config/api'
 
-export default class Tag extends Component {
+export default class ArticleTag extends Component {
   constructor(props) {
     super(props)
     this.state = {
       tagList: [],
       tagId: '',
       tagName: '',
+      color: '',
+      background: '',
       visible: false,
       modalTitle: '',
-      loading: false
+      loading: false,
     }
 
     this.columns = [
@@ -24,6 +26,21 @@ export default class Tag extends Component {
       {
         title: '名称',
         dataIndex: 'name',
+        render: (text, record) => (
+          <Tag color={record.background} style={{ color: record.color }}>
+            {text}
+          </Tag>
+        ),
+      },
+      {
+        title: '字体色',
+        dataIndex: 'color',
+        render: (text, record) => <span style={{ color: text, fontWeight: 'bold' }}>{text}</span>,
+      },
+      {
+        title: '背景色',
+        dataIndex: 'background',
+        render: (text, record) => <span style={{ color: text, fontWeight: 'bold' }}>{text}</span>,
       },
       {
         title: '操作',
@@ -34,7 +51,7 @@ export default class Tag extends Component {
               更新
             </Button>
             <Button type="link" danger onClick={() => this.delete(record)}>
-              { record.off === 1 ? '还原' : '删除' }
+              {record.off === 1 ? '还原' : '删除'}
             </Button>
           </Space>
         ),
@@ -47,25 +64,25 @@ export default class Tag extends Component {
   }
 
   getTagList = () => {
-    axios.post(API.getTagList, { all: true }).then(res => {
+    axios.post(API.getTagList, { all: true }).then((res) => {
       this.setState({
-        tagList: res.data
+        tagList: res.data,
       })
     })
   }
 
-  inputTag = (e) => {
+  inputTag = (e, field) => {
     this.setState({
-      tagName: e.target.value.trim(),
+      [field]: e.target.value.trim(),
     })
   }
 
   add = () => {
-    this.setState({ visible: true, modalTitle: '新增标签', tagId: '', tagName: '' })
+    this.setState({ visible: true, modalTitle: '新增标签', tagId: '', tagName: '', color: '', background: '' })
   }
 
   update = (data) => {
-    this.setState({ visible: true, modalTitle: '更新标签', tagId: data.id, tagName: data.name })
+    this.setState({ visible: true, modalTitle: '更新标签', tagId: data.id, tagName: data.name, color: data.color, background: data.background })
   }
 
   delete = (data) => {
@@ -74,7 +91,7 @@ export default class Tag extends Component {
       onOk: async () => {
         await axios.post(API.delTag, { id: data.id, off: data.off === 1 ? 0 : 1 })
         this.getTagList()
-      }
+      },
     })
   }
 
@@ -83,13 +100,15 @@ export default class Tag extends Component {
   }
 
   modalOk = async () => {
-    const { tagId, tagName, loading } = this.state
+    const { tagId, tagName, color, background, loading } = this.state
     if (loading) return
     this.setState({ loading: true })
     try {
       await axios.post(API.addTag, {
         id: tagId,
-        name: tagName
+        name: tagName,
+        color,
+        background,
       })
       this.setState({ visible: false, loading: false })
       this.getTagList()
@@ -99,7 +118,7 @@ export default class Tag extends Component {
   }
 
   render() {
-    const { visible, modalTitle, tagName } = this.state
+    const { visible, modalTitle, tagName, color, background } = this.state
     return (
       <>
         <Breadcrumb className="bread-crumb">
@@ -110,7 +129,9 @@ export default class Tag extends Component {
         </Breadcrumb>
 
         <div style={{ textAlign: 'right', marginBottom: '10px' }}>
-          <Button type="primary" onClick={this.add}>新增标签</Button>
+          <Button type="primary" onClick={this.add}>
+            新增标签
+          </Button>
         </div>
 
         <div className="tag-content">
@@ -118,8 +139,15 @@ export default class Tag extends Component {
         </div>
 
         <Modal title={modalTitle} visible={visible} onOk={this.modalOk} onCancel={this.modalCancel} cancelText="取消" okText="提交">
-          <p>名称：</p>
-          <Input placeholder="输入标签名称" value={tagName} onChange={(e) => this.inputTag(e)} />
+          <span>名称：</span>
+          <Input placeholder="输入标签名称" value={tagName} onChange={(e) => this.inputTag(e, 'tagName')} />
+          <span>字体色：</span>
+          <Input placeholder="输入标签字体色" value={color} onChange={(e) => this.inputTag(e, 'color')} />
+          <span>背景色：</span>
+          <Input placeholder="输入标签背景色" value={background} onChange={(e) => this.inputTag(e, 'background')} />
+          <Tag color={background} style={{ color: color, marginTop: '10px' }}>
+            {tagName || 'Tag'}
+          </Tag>
         </Modal>
       </>
     )

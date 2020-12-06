@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Breadcrumb, Input, Row, Col, Button, Image, Tag, DatePicker, message } from 'antd'
+import { CheckOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import { Link } from 'react-router-dom'
 import './index.scss'
@@ -56,7 +57,7 @@ class AddArticle extends Component {
         coverSrc: data.cover,
         tags: data.tag || [],
         addTime: moment(new Date(data.add_time)),
-        updTime: moment()
+        updTime: moment(),
       })
     } else {
       this.getTagList()
@@ -70,7 +71,7 @@ class AddArticle extends Component {
   }
 
   getTagList() {
-    axios.post(API.getTagList).then(res => {
+    axios.post(API.getTagList).then((res) => {
       this.setState({ tags: res.data })
     })
   }
@@ -107,7 +108,6 @@ class AddArticle extends Component {
     }
     this.setState({ tags })
   }
-
 
   changeDate(field, moment, dateStr) {
     this.setState({
@@ -149,7 +149,7 @@ class AddArticle extends Component {
         addTime: addTime && addTime.valueOf(),
         updTime: updTime && updTime.valueOf(),
         flag,
-        id: this.articleId
+        id: this.articleId,
       })
       if (this.articleId) {
         this.props.history.goBack()
@@ -209,7 +209,7 @@ class AddArticle extends Component {
               </div>
               <Input.TextArea className="marginb" placeholder="文章概要" value={summary} onChange={(e) => this.inputValue(e, 'summary')} />
               <Input.TextArea className="marginb" placeholder="文章封面地址" value={coverSrc} onChange={(e) => this.inputValue(e, 'coverSrc')} />
-              <div className="list-cover marginb">
+              <div className="blog-cover-wrap marginb">
                 <h2 className="blog-title">{title}</h2>
                 <Image className="blog-cover" width={'100%'} src={coverSrc || defaultSrc} onError={(e) => this.imgError(e)} />
               </div>
@@ -219,7 +219,13 @@ class AddArticle extends Component {
                   {tags.length ? (
                     tags.map((ele) => {
                       return (
-                        <Tag color={ ele.selected ? '#2db7f5' : '' } key={ele.name} onClick={() => this.selectTag(ele)}>
+                        <Tag
+                          color={ele.background}
+                          style={{ color: ele.color, cursor: 'pointer' }}
+                          icon={ele.selected ? <CheckOutlined /> : ''}
+                          key={ele.name}
+                          onClick={() => this.selectTag(ele)}
+                        >
                           {ele.name}
                         </Tag>
                       )
