@@ -9,6 +9,22 @@
   position: fixed;
   top: 0;
   z-index: 100;
+
+  .ant-menu-item a {
+    color: $blue;
+    &:hover {
+      color: $yellow;
+    }
+  }
+
+  .ant-menu-item:hover,
+  .ant-menu-item-selected {
+    color: $yellow !important;
+    border-bottom-color: $yellow !important;
+    a {
+      color: $yellow;
+    }
+  }
 }
 
 .header-bg {
@@ -31,7 +47,7 @@
 .header-txt {
   color: $white;
   font-weight: bold;
-  font-size: 0.32rem;
+  font-size: 2rem;
 }
 
 .ant-menu {
@@ -39,11 +55,5 @@
   background: transparent;
   border: none;
   color: $white;
-  font-size: 0.16rem;
-}
-
-.ant-menu-item:hover,
-.ant-menu-item-selected {
-  color: $yellow !important;
-  border-bottom-color: $yellow !important;
+  font-size: 1rem;
 }

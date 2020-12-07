@@ -2,15 +2,15 @@
 
 .markdown-content {
   padding: 20px;
-  font-size: 0.16rem;
+  font-size: 1rem;
   pre {
     display: block;
     background-color: #283646 !important;
-    padding: 0.1rem !important;
+    padding: 0.6rem !important;
     overflow-y: auto;
     font-weight: 300;
     font-family: Menlo, monospace;
-    border-radius: 0.04rem;
+    border-radius: 4px;
   }
   pre > code {
     border: 0px !important;

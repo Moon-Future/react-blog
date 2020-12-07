@@ -10,7 +10,7 @@
   }
   .title {
     color: #fff;
-    font-size: 0.5rem;
+    font-size: 3rem;
     text-align: right;
     font-family: cursive;
     text-shadow: 0px 0px 0 #3d3636, 1px -1px 0 #414040, 2px -2px 0 #414040, 3px -3px 0 #414040, 4px -4px 0 #414040, 5px -5px 0 #414040,
@@ -32,7 +32,8 @@
     padding-top: 10px;
     background-image: url(/static/images/bg-2.jpg);
   }
-  .comm-center, .comm-left {
+  .comm-center,
+  .comm-left {
     margin-top: -150px;
   }
 }

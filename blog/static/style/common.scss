@@ -8,8 +8,8 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 html {
-  font-size: 625%;
   overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 a {
@@ -36,6 +36,7 @@ a {
 
 .comm-main {
   margin-top: 100px;
+  min-height: calc(100vh - 500px);
 }
 .comm-left {
   border-radius: 4px;

@@ -4,7 +4,6 @@ import { Breadcrumb } from 'antd'
 import marked from 'marked'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/monokai-sublime.css'
-import '../static/style/components/blogContent.scss'
 
 const BlogContent = (props) => {
   const [content] = useState(props.content)
