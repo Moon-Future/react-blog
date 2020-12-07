@@ -1,5 +1,7 @@
+import React from 'react'
 import { Row, Col, Tag } from 'antd'
 import { CalendarTwoTone, EyeTwoTone } from '@ant-design/icons'
+import { motion } from 'framer-motion'
 import Head from 'next/head'
 import Header from '../components/Header'
 import Author from '../components/Author'
@@ -7,27 +9,46 @@ import Project from '../components/Project'
 import BlogContent from '../components/BlogContent'
 import Poetry from '../components/Poetry'
 import KonvaImage from '../components/KonvaImage'
-import '../static/style/pages/detailed.scss'
 import { formatTime } from '../util/index'
 import axios from 'axios'
 import api from '../config/api'
 
-const Home = (data) => {
-  const { articleDetail } = data
+const postVariants = {
+  initial: { x: 1000, opacity: 0 },
+  enter: { x: 0, opacity: 1, transition: { duration: 0.5, ease: [0.48, 0.15, 0.25, 0.96] } },
+  exit: {
+    x: 1000,
+    opacity: 0,
+    transition: { duration: 0.5, ease: [0.48, 0.15, 0.25, 0.96] }
+  }
+}
+
+const titleVariants = {
+  initial: { x: 500, opacity: 0 },
+  enter: { x: 0, opacity: 1, transition: { duration: 1, ease: [0.48, 0.15, 0.25, 0.96] } }
+}
+
+const infoVariants = {
+  initial: { y: 50, opacity: 0 },
+  enter: { y: 0, opacity: 1, transition: { duration: 1, ease: [0.48, 0.15, 0.25, 0.96] } }
+}
+
+const Home = (props) => {
+  const { articleDetail, route } = props
   return (
     <div className="container detailed-container">
       <Head>
         <title>MyBlog</title>
       </Head>
 
-      <Header />
+      <Header route={route} />
 
       <div className="article-cover" style={{ backgroundImage: articleDetail.cover ? `url(${articleDetail.cover})` : '' }}>
         <Row className="detail-row" type="flex" justify="center">
           <Col xs={0} sm={0} md={0} lg={5} xl={4} xxl={3}></Col>
           <Col xs={24} sm={24} md={24} lg={16} xl={16} xxl={16}>
-            <p className="title">{articleDetail.title}</p>
-            <p className="info">
+            <motion.p className="title" initial="initial" animate="enter" exit="exit" variants={titleVariants}>{articleDetail.title}</motion.p>
+            <motion.p className="info" initial="initial" animate="enter" exit="exit" variants={infoVariants}>
               <span>
                 {articleDetail.tag.map((ele) => (
                   <Tag key={ele.name} color={ele.background} style={{ color: ele.color }}>
@@ -43,7 +64,7 @@ const Home = (data) => {
                 <EyeTwoTone />
                 {articleDetail.view} 人
               </span>
-            </p>
+            </motion.p>
           </Col>
         </Row>
       </div>
@@ -56,9 +77,9 @@ const Home = (data) => {
 
         <Col className="comm-center" xs={24} sm={24} md={24} lg={16} xl={16} xxl={16}>
           <div className="comm-center-bg"></div>
-          <div className="comm-center-content">
+          <motion.div initial="initial" animate="enter" exit="exit" variants={postVariants} className="comm-center-content">
             <BlogContent content={articleDetail.mdContent} />
-          </div>
+          </motion.div>
         </Col>
 
         {/* <Col className="comm-right" xs={0} sm={0} md={0} lg={0} xl={4} xxl={3}>
@@ -69,15 +90,12 @@ const Home = (data) => {
   )
 }
 
-Home.getInitialProps = async (context) => {
+export async function getServerSideProps(context) {
   const id = context.query.id
-  const promise = new Promise((resolve) => {
-    axios.post(api.getArticle, { id }).then((res) => {
-      resolve(res.data)
-    })
-  })
-
-  return { articleDetail: await promise }
+  const result = await axios.post(api.getArticle, { id })
+  return {
+    props: { articleDetail: result.data }, // will be passed to the page component as props
+  }
 }
 
 export default Home

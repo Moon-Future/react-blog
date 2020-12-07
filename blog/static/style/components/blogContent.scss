@@ -1,15 +1,16 @@
-@import '/static/style/variable.scss';
+@import '../variable.scss';
 
 .markdown-content {
   padding: 20px;
+  font-size: 0.16rem;
   pre {
     display: block;
     background-color: #283646 !important;
-    padding: 0.5rem !important;
+    padding: 0.1rem !important;
     overflow-y: auto;
     font-weight: 300;
     font-family: Menlo, monospace;
-    border-radius: 0.3rem;
+    border-radius: 0.04rem;
   }
   pre > code {
     border: 0px !important;

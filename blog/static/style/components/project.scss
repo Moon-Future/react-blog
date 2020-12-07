@@ -1,8 +1,8 @@
-@import '/static/style/variable.scss';
+@import '../variable.scss';
 
 .project-div {
   text-align: center;
-  padding: 1rem;
+  padding: 0.1rem;
   // background: linear-gradient(to bottom, #330200, #001419);
   // border: 1px solid $cyber02;
 }
@@ -19,12 +19,13 @@
   margin-left: 5px;
 }
 .project-title {
-  font-size: 1rem;
+  font-size: 0.16rem;
   color: $black;
   padding: 0;
   margin: 0;
 }
 .project-descr {
+  font-size: 0.14rem;
   color: $cyber01;
   padding: 0;
   margin: 0;

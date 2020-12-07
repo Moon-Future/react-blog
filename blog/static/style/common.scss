@@ -7,6 +7,10 @@ body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
+html {
+  font-size: 625%;
+  overflow-x: hidden;
+}
 
 a {
   color: inherit;
@@ -34,7 +38,7 @@ a {
   margin-top: 100px;
 }
 .comm-left {
-  border-radius: 0.3rem;
+  border-radius: 4px;
   height: 100%;
 }
 .comm-center {
@@ -59,7 +63,7 @@ a {
 .comm-box {
   background-color: #fff;
   padding: 0.3rem;
-  border-radius: 0.3rem;
+  border-radius: 4px;
   margin-bottom: 20px;
 }
 
@@ -68,4 +72,14 @@ a {
 }
 .ant-breadcrumb-link a:hover {
   color: $origin;
+}
+
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 5px;
+  background: $red;
+  z-index: 100;
+  width: 50%;
 }

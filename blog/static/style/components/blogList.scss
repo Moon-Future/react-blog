@@ -1,11 +1,11 @@
-@import '/static/style/variable.scss';
+@import '../variable.scss';
 
 .bread-div {
   padding: 8px;
 }
 .list-title {
-  font-size: 2rem;
-  padding: 0 0.5rem;
+  font-size: 0.32rem;
+  padding: 0 0.1rem;
   cursor: pointer;
   display: inline-block;
   &:hover {
@@ -13,11 +13,11 @@
   }
 }
 .list-summary {
-  font-size: 16px;
-  padding: 0.5rem;
+  font-size: 0.16rem;
+  padding: 0.1rem;
 }
 .list-icon {
-  padding: 0.5rem 0;
+  padding: 0.1rem 0;
   color: $black;
 }
 .list-icon span {
@@ -50,7 +50,7 @@
   color: $white;
   position: absolute;
   z-index: 10;
-  font-size: 2rem;
+  font-size: 0.32rem;
   width: 70%;
   text-align: center;
   cursor: pointer;

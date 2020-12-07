@@ -18,3 +18,29 @@ export function formatTime(date, format) {
   }
   return format
 }
+
+export function fontSizeAuto(oriWidth) {
+  return function () {
+    let viewportWidth = document.documentElement.clientWidth
+    if (viewportWidth > oriWidth) {
+      viewportWidth = oriWidth
+    }
+    if (viewportWidth < 320) {
+      viewportWidth = 320
+    }
+    document.documentElement.style.fontSize = viewportWidth / (oriWidth / 100) + 'px'
+  }
+}
+
+export function throttle(fn, wait) {
+  let previous = 0 
+  return function() {
+    const context = this
+    const arg = arguments
+    const now = Date.now()
+    if (now - previous > wait) {
+      fn.apply(context, arg)
+      previous = now
+    }
+  }
+}

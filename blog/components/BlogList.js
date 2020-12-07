@@ -7,6 +7,7 @@ import { formatTime } from '../util/index'
 
 const BlogList = (props) => {
   const [articleList] = useState(props.articleList)
+
   return (
     <>
       {/* <div className="bread-div">

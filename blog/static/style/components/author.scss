@@ -1,16 +1,16 @@
-@import '/static/style/variable.scss';
+@import '../variable.scss';
 
 .author-div {
   text-align: center;
-  padding: 1rem;
+  padding: 0.1rem;
   // background: linear-gradient(to bottom, #330200, #001419);
   // border: 1px solid $black;
 }
 .author-div div {
-  margin-bottom: 1rem;
+  margin-bottom: 0.1rem;
 }
 .author-introduction {
-  font-size: 0.8rem;
+  font-size: 0.16rem;
   color: $red;
 }
 .account {
