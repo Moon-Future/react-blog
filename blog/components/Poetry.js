@@ -1,16 +1,29 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import '../static/style/components/poetry.scss'
 
-const Poetry = () => (
-  <div className="poetry comm-box">
-    <div className="portey-content">
-      <p>君问归期未有期，</p>
-      <p>巴山夜雨涨秋池。</p>
-      <p>何当共剪西窗烛，</p>
-      <p>却话巴山夜雨时。</p>
+const Poetry = (props) => {
+  const { poetry } = props
+  const sentence = poetry && poetry.sentence || ''
+
+  return poetry ? (
+    <div className="poetry-box comm-box">
+      <div className="poetry-content">
+        {poetry.origin.content.map((ele, i) => {
+          const index = ele.indexOf(sentence)
+          return index === -1 ? (
+            <p key={i}>{ele}</p>
+          ) : (
+            <p key={i}>
+              {ele.slice(0, index)} <span className="poetry-sel">{ele.slice(index)}</span>
+            </p>
+          )
+        })}
+      </div>
+      <p className="poetry-author">
+        《{poetry.origin.title}》--{poetry.origin.author}/{poetry.origin.dynasty}
+      </p>
     </div>
-    <p className="poetry-author">《夜雨寄北》--李商隐/唐代</p>
-  </div>
-)
+  ) : null
+}
 
 export default Poetry

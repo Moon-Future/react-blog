@@ -1,17 +1,16 @@
 @import '../variable.scss';
 
-.poetry {
-  background: linear-gradient(to bottom, #330200, #001419);
-}
-.poetry p {
-  margin-bottom: 0.3rem;
-}
-.portey-content {
-  color: $cyber03;
-  margin: 0;
-  font-size: 1rem;
-}
-.poetry-author {
-  color: $cyber01;
-  text-align: right;
+.poetry-box {
+  padding: 0.5rem;
+  p {
+    margin-bottom: 0.3rem;
+    color: #705e5e;
+  }
+  .poetry-author {
+    text-align: right;
+  }
+  .poetry-sel {
+    color: $red;
+    font-weight: bold;
+  }
 }

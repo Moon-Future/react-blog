@@ -27,6 +27,7 @@ a {
   background-repeat: repeat;
   display: flex;
   align-items: center;
+  justify-content: center;
   position: fixed;
   top: 0;
   bottom: 0;
@@ -83,4 +84,15 @@ a {
   background: $red;
   z-index: 100;
   width: 50%;
+}
+
+.poetry-sentence {
+  font-size: 2.5rem;
+  color: $white;
+  font-family: cursive, KaiTi, SimSun;
+}
+.sentence-wrap {
+  position: absolute;
+  top: -175px;
+  right: 0;
 }

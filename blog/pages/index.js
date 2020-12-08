@@ -1,13 +1,8 @@
-import { Row, Col } from 'antd'
+import React from 'react'
 import { motion } from 'framer-motion'
 import Head from 'next/head'
 import Header from '../components/Header'
-import Author from '../components/Author'
-import Project from '../components/Project'
-import BlogList from '../components/BlogList'
-import { fontSizeAuto, throttle } from '../util/index'
-import axios from 'axios'
-import api from '../config/api'
+import PoetrySentence from '../components/PoetrySentence'
 
 const postVariants = {
   initial: { scale: 0.96, y: 30, opacity: 0 },
@@ -20,26 +15,43 @@ const postVariants = {
   },
 }
 
-const Home = (props) => {
-  const { articleList, route } = props
-  return (
-    <motion.div initial="initial" animate="enter" exit="exit" className="container index-container">
-      <Head>
-        <title>MyBlog</title>
-      </Head>
-
-      <Header route={route} />
-
-      <div className="page-background"></div>
-    </motion.div>
-  )
-}
-
-export async function getServerSideProps(context) {
-  const result = await axios.post(api.getArticleList)
-  return {
-    props: { articleList: result.data }, // will be passed to the page component as props
+const sentenceVariants = {
+  initial: { scale: 0.96, opacity: 1 },
+  exit: {
+    scale: 0.6,
+    y: -100,
+    x: 300,
+    opacity: 0,
+    transition: { duration: 0.5, ease: [0.48, 0.15, 0.25, 0.96] },
   }
 }
 
-export default Home
+export default class Home extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      poetry: {},
+      sentence: '',
+      finish: false,
+    }
+  }
+
+  render() {
+    const { route } = this.props
+    return (
+      <motion.div initial="initial" animate="enter" exit="exit" className="container index-container">
+        <Head>
+          <title>MyBlog</title>
+        </Head>
+
+        <Header route={route} />
+
+        <div className="page-background">
+          <motion.div initial="initial" animate="enter" exit="exit" variants={sentenceVariants} >
+            <PoetrySentence />
+          </motion.div>
+        </div>
+      </motion.div>
+    )
+  }
+}
