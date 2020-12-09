@@ -1,9 +1,7 @@
 import React, { Component } from 'react'
 import { Breadcrumb, Table, Space, Button, Modal, Input, Tag } from 'antd'
 import { Link } from 'react-router-dom'
-import axios from '../../util/axios'
-import API from '../../config/api'
-
+import ajax from '../../util/ajax'
 export default class ArticleTag extends Component {
   constructor(props) {
     super(props)
@@ -64,7 +62,7 @@ export default class ArticleTag extends Component {
   }
 
   getTagList = () => {
-    axios.post(API.getTagList, { all: true }).then((res) => {
+    ajax.post('getTagList', { all: true }).then((res) => {
       this.setState({
         tagList: res.data,
       })
@@ -89,7 +87,7 @@ export default class ArticleTag extends Component {
     Modal.confirm({
       title: data.off === 1 ? '确认还原？' : '确认删除？',
       onOk: async () => {
-        await axios.post(API.delTag, { id: data.id, off: data.off === 1 ? 0 : 1 })
+        await ajax.post('delTag', { id: data.id, off: data.off === 1 ? 0 : 1 })
         this.getTagList()
       },
     })
@@ -104,7 +102,7 @@ export default class ArticleTag extends Component {
     if (loading) return
     this.setState({ loading: true })
     try {
-      await axios.post(API.addTag, {
+      await ajax.post('addTag', {
         id: tagId,
         name: tagName,
         color,

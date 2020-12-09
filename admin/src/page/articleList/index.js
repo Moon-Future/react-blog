@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
-import { Breadcrumb, Table, Space, Button, Tag } from 'antd'
+import { Breadcrumb, Table, Space, Button, Tag, Modal } from 'antd'
 import { Link } from 'react-router-dom'
-import axios from '../../util/axios'
-import API from '../../config/api'
+import ajax from '../../util/ajax'
 import { formatTime } from '../../util/index'
 
 class ArticleList extends Component {
@@ -61,7 +60,7 @@ class ArticleList extends Component {
         render: (text, record) => (
           <Space size="middle">
             <Link to={`/addArticle?id=${record.id}`}>更新</Link>
-            <Button type="link" danger onClick={this.delArticle}>
+            <Button type="link" danger onClick={() => this.delArticle(record)}>
               删除
             </Button>
           </Space>
@@ -71,7 +70,11 @@ class ArticleList extends Component {
   }
 
   componentDidMount() {
-    axios.post(API.getArticleList).then((res) => {
+    this.getArticleList()
+  }
+
+  getArticleList = () => {
+    ajax.post('getArticleList').then((res) => {
       let data = res.data
       data.forEach((ele) => {
         ele.add_time = formatTime(ele.add_time, 'yyyy-MM-dd hh:mm')
@@ -83,8 +86,14 @@ class ArticleList extends Component {
     })
   }
 
-  delArticle = () => {
-    console.log(this)
+  delArticle = (data) => {
+    Modal.confirm({
+      title: data.off === 1 ? '确认还原？' : '确认删除？',
+      onOk: async () => {
+        await ajax.post('delArticle', { id: data.id })
+        this.getArticleList()
+      },
+    })
   }
 
   render() {

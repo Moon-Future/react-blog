@@ -2,19 +2,6 @@ import axios from 'axios'
 import { message } from 'antd'
 
 /**
- * 跳转登录页
- * 携带当前页面路由，以期在登录页面完成登录后返回当前页面
- */
-const toLogin = () => {
-  // router.replace({
-  //   path: '/login',
-  //   query: {
-  //     redirect: router.currentRoute.fullPath
-  //   }
-  // })
-}
-
-/**
  * 请求失败后的错误统一处理
  * @param {Number} status 请求失败的状态码
  */
@@ -23,28 +10,27 @@ const errorHandle = (status, msg) => {
   switch (status) {
     // 400
     case 400:
-      message.error(msg)
+      message.error(msg, 1)
       break
     // 401: 未登录状态，跳转登录页
     case 401:
-      toLogin()
+      message.error(msg, 1)
+      setTimeout(() => {
+        window.location.href = '/login'
+      }, 1500);
       break
     // 403 token 过期
     // 清除 token 并跳转登录页
     case 403:
-      message.error('登录过期，请重新登录', 'error')
+      message.error('登录过期，请重新登录', 1)
       localStorage.removeItem('token')
-      // store.commit('loginSuccess', null)
-      // setTimeout(() => {
-      //   toLogin()
-      // }, 1000)
       break
     // 404 请求不存在
     case 404:
-      message.error('请求的资源不存在', 'error')
+      message.error('请求的资源不存在', 1)
       break
     case 500:
-      message.error('服务器开小差啦😅', 'error')
+      message.error('服务器开小差啦😅', 1)
       break
     default:
       console.log(msg)
@@ -88,11 +74,11 @@ instance.interceptors.response.use(
     // 如果返回的状态码为200，说明接口请求成功，可以正常拿到数据
     // 否则的话抛出错误
     if (res.status === 200) {
-      res.data.message && message.success(res.data.message)
+      res.data.message && message.success(res.data.message, 1)
       return Promise.resolve(res)
     } else if (res.status === 202) {
       // 已接受。已经接受请求，但未处理完成
-      res.data.message && message.info(res.data.message)
+      res.data.message && message.info(res.data.message, 1)
       return Promise.reject(res)
     } else {
       return Promise.reject(res)

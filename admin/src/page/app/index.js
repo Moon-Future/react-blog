@@ -2,7 +2,7 @@ import { Route, Switch } from 'react-router-dom'
 import Home from '../home'
 import Login from '../login'
 
-function App() {
+function App(props) {
   return (
     <div className="app">
       <Switch>
