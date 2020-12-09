@@ -5,7 +5,8 @@ import { motion } from 'framer-motion'
 import Head from 'next/head'
 import Header from '../components/Header'
 import Catalog from '../components/Catalog'
-import Tocify from '../components/tocify.tsx'
+import Author from '../components/Author'
+import Project from '../components/Project'
 import marked from 'marked'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/monokai-sublime.css'
@@ -36,14 +37,18 @@ const infoVariants = {
 
 const Home = (props) => {
   const { articleDetail, route } = props
-  const tocify = new Tocify()
   const renderer = new marked.Renderer()
   const catalogData = []
+  let index = 0
   renderer.heading = function (text, level, raw) {
-    const anchor = tocify.add(text, level)
-    catalogData.push({
-      text, level
-    })
+    let anchor = `toc${level}${++index}`
+    if (level !== 1) {
+      catalogData.push({
+        text,
+        level,
+        anchor,
+      })
+    }
     return `<p id="${anchor}" class="anchor-fix"><h${level}>${text}</h${level}></p>\n`
   }
   marked.setOptions({
@@ -62,7 +67,6 @@ const Home = (props) => {
     },
   })
   const html = marked(articleDetail.mdContent)
-  console.log('catalogData', catalogData)
 
   return (
     <div className="container detailed-container">
@@ -103,9 +107,16 @@ const Home = (props) => {
       <Row className="comm-main" type="flex" justify="center">
         <Col className="comm-left" xs={0} sm={0} md={0} lg={5} xl={4} xxl={3}>
           <Affix offsetTop={90}>
-            <div className="comm-box">
-              {tocify && tocify.render()}
-            </div>
+            {catalogData.length ? (
+              <div className="comm-box">
+                <Catalog catalogData={catalogData} />
+              </div>
+            ) : (
+              <>
+                <Author />
+                <Project />
+              </>
+            )}
           </Affix>
         </Col>
 

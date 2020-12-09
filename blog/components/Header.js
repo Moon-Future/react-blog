@@ -5,7 +5,8 @@ import '../static/style/components/header.scss'
 
 const Header = (props) => {
   const { route } = props
-  const selectedKey = route === '/article' || route === '/detailed' ? '/article' : route
+  // const selectedKey = route === '/article' || route === '/detailed' ? '/article' : route
+  const selectedKey = route
   return (
     <div className="header">
       <div className="header-bg"></div>
