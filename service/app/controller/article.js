@@ -12,7 +12,9 @@ if (!fs.existsSync(filePath)) {
 class ArticleController extends Controller {
   // 获取文章列表
   async getArticleList() {
-    const result = await this.app.mysql.select('article')
+    const result = await this.app.mysql.select('article', {
+      where: { off: 0 }
+    })
     const tagAll = await this.app.mysql.select('tag')
     result.forEach((item) => {
       const tagSplit = item.tag.split(',')
@@ -52,7 +54,7 @@ class ArticleController extends Controller {
       result.mdContent = fs.readFileSync(path.join(filePath, result.title + '.md'), 'utf-8')
       this.ctx.body = result
     } else {
-      this.ctx.status = 202
+      this.ctx.status = 400
       this.ctx.body = { message: '未找到此文章' }
     }
   }
@@ -82,7 +84,7 @@ class ArticleController extends Controller {
         fs.writeFileSync(path.join(filePath, title + '.md'), content, 'utf-8')
         this.ctx.body = { message: '更新成功' }
       } else {
-        this.ctx.status = 202
+        this.ctx.status = 400
         this.ctx.body = { message: '更新失败，请稍后重试' }
       }
     } else {
@@ -92,7 +94,7 @@ class ArticleController extends Controller {
       data.view = 0
       const result = await this.app.mysql.get('article', { title })
       if (result) {
-        this.ctx.status = 202
+        this.ctx.status = 400
         this.ctx.body = {
           message: '文章标题已存在',
         }
@@ -104,10 +106,21 @@ class ArticleController extends Controller {
           fs.writeFileSync(path.join(filePath, title + '.md'), content, 'utf-8')
           this.ctx.body = { message: '新增成功' }
         } else {
-          this.ctx.status = 202
+          this.ctx.status = 400
           this.ctx.body = { message: '新增失败，请稍后重试' }
         }
       }
+    }
+  }
+
+  async delArticle() {
+    const { id } = this.ctx.request.body
+    const request = await this.app.mysql.update('article', { id, off: 1 })
+    if (request.affectedRows === 1) {
+      this.ctx.body = { message: '成功' }
+    } else {
+      this.ctx.status = 400
+      this.ctx.body = { message: '失败，请稍后重试' }
     }
   }
 }

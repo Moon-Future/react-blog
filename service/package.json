@@ -11,6 +11,7 @@
     "egg-cors": "^2.2.3",
     "egg-mysql": "^3.0.0",
     "egg-scripts": "^2.11.0",
+    "jsonwebtoken": "^8.5.1",
     "shortid": "^2.2.16"
   },
   "devDependencies": {
