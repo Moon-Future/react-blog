@@ -1,5 +1,5 @@
 import { Avatar, Divider, Popover, Image } from 'antd'
-import '../static/style/components/author.scss'
+import '../static/style/components/author.less'
 import { WechatFilled, GithubFilled, QqCircleFilled } from '@ant-design/icons'
 
 const Author = () => {

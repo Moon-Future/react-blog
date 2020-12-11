@@ -1,4 +1,4 @@
-@import './variable.scss';
+@import './variable.less';
 
 html,
 body {
@@ -48,7 +48,7 @@ a {
   padding: 0 10px;
 }
 .comm-center-bg {
-  background: $gray;
+  background: @gray;
   position: absolute;
   top: 0;
   bottom: 0;
@@ -70,10 +70,10 @@ a {
 }
 
 .ant-breadcrumb a {
-  color: $black;
+  color: @black;
 }
 .ant-breadcrumb-link a:hover {
-  color: $origin;
+  color: @origin;
 }
 
 .scroll-progress {
@@ -81,14 +81,14 @@ a {
   top: 0;
   left: 0;
   height: 5px;
-  background: $red;
+  background: @red;
   z-index: 100;
   width: 50%;
 }
 
 .poetry-sentence {
   font-size: 2.5rem;
-  color: $white;
+  color: @white;
   font-family: cursive, KaiTi, SimSun;
 }
 .sentence-wrap {

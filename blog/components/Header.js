@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { Row, Col, Menu } from 'antd'
-import '../static/style/components/header.scss'
+import '../static/style/components/header.less'
 
 const Header = (props) => {
   const { route } = props

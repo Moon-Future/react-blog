@@ -10,7 +10,7 @@ import Project from '../components/Project'
 import marked from 'marked'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/monokai-sublime.css'
-import '../static/style/pages/detailed.scss'
+import '../static/style/pages/detailed.less'
 import { formatTime } from '../util/index'
 import axios from 'axios'
 import api from '../config/api'
@@ -132,10 +132,16 @@ const Home = (props) => {
 }
 
 export async function getServerSideProps(context) {
-  const id = context.query.id
-  const result = await axios.post(api.getArticle, { id })
-  return {
-    props: { articleDetail: result.data }, // will be passed to the page component as props
+  try {
+    const id = context.query.id
+    const result = await axios.post(api.getArticle, { id })
+    return {
+      props: { articleDetail: result.data }, // will be passed to the page component as props
+    }
+  } catch (e) {
+    return {
+      props: { articleDetail: { mdContent: '' } }, // will be passed to the page component as props
+    }
   }
 }
 

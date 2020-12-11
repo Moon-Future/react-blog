@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { List, Breadcrumb, Image, Tag } from 'antd'
-import '../static/style/components/blogList.scss'
+import '../static/style/components/blogList.less'
 import { CalendarTwoTone, EyeTwoTone } from '@ant-design/icons'
 import { formatTime } from '../util/index'
 

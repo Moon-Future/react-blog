@@ -1,5 +1,5 @@
 import { Image } from 'antd'
-import '../static/style/components/project.scss'
+import '../static/style/components/project.less'
 
 const Project = () => {
   return (

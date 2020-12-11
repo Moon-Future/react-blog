@@ -1,5 +1,5 @@
 import { Anchor } from 'antd'
-import '../static/style/components/catalog.scss'
+import '../static/style/components/catalog.less'
 const { Link } = Anchor
 
 export default function Catalog(props) {

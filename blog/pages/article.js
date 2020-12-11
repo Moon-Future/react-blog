@@ -8,7 +8,7 @@ import Project from '../components/Project'
 import BlogList from '../components/BlogList'
 import Poetry from '../components/Poetry'
 import PoetrySentence from '../components/PoetrySentence'
-import '../static/style/pages/article.scss'
+import '../static/style/pages/article.less'
 import axios from 'axios'
 import api from '../config/api'
 import { getPoetry } from '../util'
@@ -81,9 +81,15 @@ const Home = (props) => {
 }
 
 export async function getServerSideProps(context) {
-  const result = await axios.post(api.getArticleList)
-  return {
-    props: { articleList: result.data }, // will be passed to the page component as props
+  try {
+    const result = await axios.post(api.getArticleList)
+    return {
+      props: { articleList: result.data }, // will be passed to the page component as props
+    }
+  } catch (e) {
+    return {
+      props: { articleList: [] }, // will be passed to the page component as props
+    }
   }
 }
 

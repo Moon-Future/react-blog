@@ -1,4 +1,5 @@
 const withCSS = require('@zeit/next-css')
-const withSass = require('@zeit/next-sass')
+// const withSass = require('@zeit/next-sass')
+const withLess = require('@zeit/next-less')
 // module.exports = withCSS({})
-module.exports = () => withSass(withCSS())
+module.exports = () => withLess(withCSS())

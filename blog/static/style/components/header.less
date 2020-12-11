@@ -1,7 +1,7 @@
-@import '../variable.scss';
+@import '../variable.less';
 
 .header {
-  color: $white;
+  color: @white;
   height: 80px;
   width: 100%;
   display: flex;
@@ -11,18 +11,18 @@
   z-index: 100;
 
   .ant-menu-item a {
-    color: $blue;
+    color: @blue;
     &:hover {
-      color: $yellow;
+      color: @yellow;
     }
   }
 
   .ant-menu-item:hover,
   .ant-menu-item-selected {
-    color: $yellow !important;
-    border-bottom-color: $yellow !important;
+    color: @yellow !important;
+    border-bottom-color: @yellow !important;
     a {
-      color: $yellow;
+      color: @yellow;
     }
   }
 }
@@ -31,7 +31,7 @@
   position: absolute;
   height: 80px;
   width: 100%;
-  background: $black;
+  background: @black;
   opacity: 0.8;
 }
 
@@ -45,7 +45,7 @@
 }
 
 .header-txt {
-  color: $white;
+  color: @white;
   font-weight: bold;
   font-size: 2rem;
 }
@@ -54,6 +54,6 @@
   text-align: center;
   background: transparent;
   border: none;
-  color: $white;
+  color: @white;
   font-size: 1rem;
 }
