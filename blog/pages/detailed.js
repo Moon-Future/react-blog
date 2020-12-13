@@ -7,6 +7,7 @@ import Header from '../components/Header'
 import Catalog from '../components/Catalog'
 import Author from '../components/Author'
 import Project from '../components/Project'
+import ScrollTop from '../components/ScrollTop'
 import marked from 'marked'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/monokai-sublime.css'
@@ -71,7 +72,7 @@ const Home = (props) => {
   return (
     <div className="container detailed-container">
       <Head>
-        <title>MyBlog</title>
+        <title>学无止境，厚积薄发</title>
       </Head>
 
       <Header route={route} />
@@ -127,6 +128,8 @@ const Home = (props) => {
           </motion.div>
         </Col>
       </Row>
+
+      <ScrollTop />
     </div>
   )
 }

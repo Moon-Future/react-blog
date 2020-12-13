@@ -1,0 +1,26 @@
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+      - 9002:9002
+    environment:
+      - MYSQL_HOST=mydb
+      - MYSQL_USER=chenliang
+      - MYSQL_PASSWORD=489584507
+      - MYSQL_DATABASE=react_blog
+    depends_on:
+      - db
+    container_name: webapp
+  db:
+    image: 'mysql'
+    ports:
+      - 33061:3306
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_USER=chenliang
+      - MYSQL_PASSWORD=489584507
+      - MYSQL_DATABASE=react_blog
+    container_name: mydb

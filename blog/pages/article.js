@@ -11,7 +11,7 @@ import PoetrySentence from '../components/PoetrySentence'
 import '../static/style/pages/article.less'
 import axios from 'axios'
 import api from '../config/api'
-import { getPoetry } from '../util'
+import '../static/style/pages/article.less'
 
 const postVariants = {
   initial: { scale: 0.96, y: 30, opacity: 0 },
@@ -32,7 +32,7 @@ const sentenceVariants = {
     x: -300,
     opacity: 0,
     transition: { duration: 0.5, ease: [0.48, 0.15, 0.25, 0.96] },
-  }
+  },
 }
 
 const Home = (props) => {
@@ -46,13 +46,12 @@ const Home = (props) => {
   return (
     <div className="container article-container">
       <Head>
-        <title>MyBlog</title>
+        <title>学无止境，厚积薄发</title>
       </Head>
 
       <Header route={route} />
 
-      <div className="page-background">
-      </div>
+      <div className="page-background"></div>
       <div style={{ height: '500px' }}></div>
 
       <Row className="comm-main comm-main-index" type="flex" justify="center">

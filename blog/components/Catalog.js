@@ -54,7 +54,7 @@ export default function Catalog(props) {
     })
   }
 
-  const click = (e, link) => {
+  const click = (e) => {
     e.preventDefault()
   }
 
