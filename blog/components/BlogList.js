@@ -47,7 +47,9 @@ const BlogList = (props) => {
             <Link href={'/detailed?id=' + item.id}>
               <div className="list-cover">
                 <h2 className="blog-title">{item.title}</h2>
-                <Image className="blog-cover" width={'100%'} preview={false} src={item.cover} />
+                <div className="blog-cover">
+                  <Image width={'100%'} preview={false} src={item.cover} />
+                </div>
               </div>
             </Link>
             <div className="list-summary">{item.summary}</div>

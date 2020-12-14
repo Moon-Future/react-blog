@@ -1,4 +1,4 @@
-const HOST = 'http://116.62.191.5:9002'
+const HOST = 'http://localhost:9002'
 
 const API = {
   getArticleList: HOST + '/api/getArticleList',

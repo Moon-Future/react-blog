@@ -66,6 +66,8 @@ export default class ArticleTag extends Component {
       this.setState({
         tagList: res.data,
       })
+    }).catch(e => {
+      console.log(e)
     })
   }
 

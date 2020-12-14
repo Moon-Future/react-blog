@@ -83,6 +83,8 @@ class ArticleList extends Component {
       this.setState({
         articleList: res.data,
       })
+    }).catch(e => {
+      console.log(e)
     })
   }
 

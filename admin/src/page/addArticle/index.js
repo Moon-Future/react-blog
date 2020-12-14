@@ -73,6 +73,8 @@ class AddArticle extends Component {
   getTagList() {
     axios.post(API.getTagList).then((res) => {
       this.setState({ tags: res.data })
+    }).catch(e => {
+      console.log(e)
     })
   }
 

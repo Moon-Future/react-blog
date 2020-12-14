@@ -38,11 +38,12 @@
 }
 .blog-cover {
   height: 300px;
-  // border: 10px solid #1c0a0b;
   overflow: hidden;
   cursor: pointer;
-  object-fit: cover;
-  transition: all 0.6s;
+  img {
+    object-fit: cover;
+    transition: all 0.6s;
+  }
 }
 .blog-title {
   color: @white;
