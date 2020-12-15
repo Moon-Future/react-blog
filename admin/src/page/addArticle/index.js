@@ -41,7 +41,6 @@ class AddArticle extends Component {
       breaks: false,
       smartLists: true,
       smartypants: false,
-      sanitize: false,
       xhtml: false,
       highlight: function (code) {
         return hljs.highlightAuto(code).value
