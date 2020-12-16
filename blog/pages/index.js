@@ -1,4 +1,3 @@
-import React from 'react'
 import { motion } from 'framer-motion'
 import Head from 'next/head'
 import Header from '../components/Header'
@@ -17,34 +16,26 @@ const sentenceVariants = {
   },
 }
 
-export default class Home extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      poetry: {},
-      sentence: '',
-      finish: false,
-    }
-  }
+const Home = (props) => {
+  const { route } = props
 
-  render() {
-    const { route } = this.props
-    return (
-      <motion.div initial="initial" animate="enter" exit="exit" className="container index-container">
-        <Head>
-          <title>欢迎来到我的世界</title>
-        </Head>
+  return (
+    <motion.div initial="initial" animate="enter" exit="exit" className="container index-container">
+      <Head>
+        <title>欢迎来到我的世界</title>
+      </Head>
 
-        <Header route={route} />
+      <Header route={route} />
 
-        <div className="page-background">
-          <motion.div initial="initial" animate="enter" exit="exit" variants={sentenceVariants}>
-            <PoetrySentence />
-          </motion.div>
-        </div>
+      <div className="page-background">
+        <motion.div initial="initial" animate="enter" exit="exit" variants={sentenceVariants}>
+          <PoetrySentence />
+        </motion.div>
+      </div>
 
-        <ScrollTop />
-      </motion.div>
-    )
-  }
+      <ScrollTop />
+    </motion.div>
+  )
 }
+
+export default Home

@@ -36,7 +36,7 @@ const infoVariants = {
   enter: { y: 0, opacity: 1, transition: { duration: 1, ease: [0.48, 0.15, 0.25, 0.96] } },
 }
 
-const Home = (props) => {
+const Detailed = (props) => {
   const { articleDetail, route } = props
   const renderer = new marked.Renderer()
   const catalogData = []
@@ -148,4 +148,4 @@ export async function getServerSideProps(context) {
   }
 }
 
-export default Home
+export default Detailed

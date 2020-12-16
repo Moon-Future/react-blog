@@ -25,10 +25,11 @@ services:
     ports:
       - 9002:9002
     environment:
-      - MYSQL_HOST=host.docker.internal
+      - MYSQL_HOST=172.17.0.1
       - MYSQL_USER=root
       - MYSQL_PASSWORD=8023
       - HOST=0.0.0.0
+    # network_mode: host
     networks: 
       - my-net
     container_name: webapp

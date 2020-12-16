@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Row, Col } from 'antd'
 import { motion } from 'framer-motion'
 import Head from 'next/head'
@@ -11,7 +11,6 @@ import PoetrySentence from '../components/PoetrySentence'
 import '../static/style/pages/article.less'
 import axios from 'axios'
 import api from '../config/api'
-import '../static/style/pages/article.less'
 
 const postVariants = {
   initial: { scale: 0.96, y: 30, opacity: 0 },
@@ -35,13 +34,24 @@ const sentenceVariants = {
   },
 }
 
-const Home = (props) => {
+const Article = (props) => {
   const { articleList, route } = props
   const [poetry, setPoetry] = useState(null)
+  const [value, setValue] = useState(0)
 
   const getPoetry = (data) => {
     setPoetry(data)
   }
+
+  useEffect(() => {
+    let timer = setInterval(() => {
+      setValue(value + 1)
+      if (value > 10) {
+        clearInterval(timer)
+      }
+    }, 500);
+    return () => clearInterval(timer)
+  }, [])
 
   return (
     <div className="container article-container">
@@ -62,6 +72,7 @@ const Home = (props) => {
         </Col>
 
         <Col className="comm-center" xs={24} sm={24} md={24} lg={16} xl={16} xxl={16}>
+          <p>{value}</p>
           <motion.div className="sentence-wrap" initial="initial" animate="enter" exit="exit" variants={sentenceVariants}>
             <PoetrySentence staticFlag={true} handlePoetry={getPoetry} />
           </motion.div>
@@ -70,16 +81,12 @@ const Home = (props) => {
             <BlogList articleList={articleList} />
           </motion.div>
         </Col>
-
-        {/* <Col className="comm-right" xs={0} sm={0} md={0} lg={0} xl={4} xxl={3}>
-          <Poetry />
-        </Col> */}
       </Row>
     </div>
   )
 }
 
-export async function getServerSideProps(context) {
+export async function getStaticProps(context) {
   try {
     const result = await axios.post(api.getArticleList)
     return {
@@ -92,4 +99,4 @@ export async function getServerSideProps(context) {
   }
 }
 
-export default Home
+export default Article
