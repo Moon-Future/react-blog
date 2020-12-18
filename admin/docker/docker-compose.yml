@@ -10,6 +10,4 @@ services:
     volumes: 
       - ../build:/www
       - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
-    # networks: 
-    #   - my-net
     container_name: react_blog_admin
