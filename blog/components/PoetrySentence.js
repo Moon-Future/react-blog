@@ -8,30 +8,31 @@ const PoetrySentence = (props) => {
   const [words, setWords] = useState(null)
   const { staticFlag, handlePoetry } = props // 是否静态展示
 
-  useEffect(
-    async () => {
-      if (words) {
-        if (words.length) {
-          setTimeout(() => {
-            setWords(words)
-            setSentence(sentence + words.shift())
-          }, 150)
-        } else {
-          setFinished(true)
-        }
+  useEffect(async () => {
+    let timer
+    if (words) {
+      if (words.length) {
+        timer = setTimeout(() => {
+          setWords(words)
+          setSentence(sentence + words.shift())
+        }, 150)
       } else {
-        let tmp = await todayPoetry()
-        if (staticFlag) {
-          setFinished(true)
-          setSentence(tmp.join(''))
-        } else {
-          setWords(tmp)
-          setSentence(tmp.shift())
-        }
+        setFinished(true)
       }
-    },
-    [sentence]
-  )
+    } else {
+      let tmp = await todayPoetry()
+      if (staticFlag) {
+        setFinished(true)
+        setSentence(tmp.join(''))
+      } else {
+        setWords(tmp)
+        setSentence(tmp.shift())
+      }
+    }
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [sentence])
 
   const todayPoetry = () => {
     return new Promise((resolve) => {

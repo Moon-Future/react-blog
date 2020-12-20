@@ -5,6 +5,22 @@ services:
       context: ../
       dockerfile: ./docker/Dockerfile
     image: react_blog:blog
-    ports:
-      - 9000:9000
+    # ports:
+    #   - 9000:9000
+    networks:
+      - react_blog
     container_name: react_blog_blog
+  nginx:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile-nginx
+    image: react_blog:nginx
+    ports:
+      - 9000:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
+    networks:
+      - react_blog
+    container_name: react_blog_nginx
+networks:
+  react_blog:

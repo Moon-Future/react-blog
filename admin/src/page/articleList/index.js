@@ -38,6 +38,7 @@ class ArticleList extends Component {
       {
         title: '阅读次数',
         dataIndex: 'view',
+        sorter: (a, b) => a.view - b.view,
       },
       {
         title: '用户',
@@ -74,18 +75,21 @@ class ArticleList extends Component {
   }
 
   getArticleList = () => {
-    ajax.post('getArticleList').then((res) => {
-      let data = res.data
-      data.forEach((ele) => {
-        ele.add_time = formatTime(ele.add_time, 'yyyy-MM-dd hh:mm')
-        ele.upd_time = formatTime(ele.upd_time, 'yyyy-MM-dd hh:mm')
+    ajax
+      .post('getArticleList')
+      .then((res) => {
+        let data = res.data
+        data.forEach((ele) => {
+          ele.add_time = formatTime(ele.add_time, 'yyyy-MM-dd hh:mm')
+          ele.upd_time = formatTime(ele.upd_time, 'yyyy-MM-dd hh:mm')
+        })
+        this.setState({
+          articleList: res.data,
+        })
       })
-      this.setState({
-        articleList: res.data,
+      .catch((e) => {
+        console.log(e)
       })
-    }).catch(e => {
-      console.log(e)
-    })
   }
 
   delArticle = (data) => {

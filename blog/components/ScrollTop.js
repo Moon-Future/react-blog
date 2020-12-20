@@ -13,15 +13,20 @@ export default function ScrollTop() {
     e.preventDefault()
   }
 
+  const scrollListen = () => {
+    const height = document.documentElement.clientHeight
+    if (document.documentElement.scrollTop > height + 300) {
+      setShow(true)
+    } else {
+      setShow(false)
+    }
+  }
+
   useEffect(() => {
-    window.addEventListener('scroll', () => {
-      const height = document.documentElement.clientHeight
-      if (document.documentElement.scrollTop > height + 300) {
-        setShow(true)
-      } else {
-        setShow(false)
-      }
-    })
+    window.addEventListener('scroll', scrollListen)
+    return () => {
+      window.removeEventListener('scroll', scrollListen)
+    }
   }, [])
 
   return (

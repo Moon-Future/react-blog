@@ -17,6 +17,9 @@ RUN npm i --production --registry=https://registry.npm.taobao.org
 # 拷贝其他所有文件到容器（除了 .dockerignore 中的目录和文件）
 COPY . /usr/src/app
 
+# build 阶段获取
+ENV HOST react_blog_service
+
 # build
 RUN npm run build
 

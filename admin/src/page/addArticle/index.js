@@ -70,11 +70,14 @@ class AddArticle extends Component {
   }
 
   getTagList() {
-    axios.post(API.getTagList).then((res) => {
-      this.setState({ tags: res.data })
-    }).catch(e => {
-      console.log(e)
-    })
+    axios
+      .post(API.getTagList)
+      .then((res) => {
+        this.setState({ tags: res.data })
+      })
+      .catch((e) => {
+        console.log(e)
+      })
   }
 
   // markdown 字符串
@@ -118,7 +121,7 @@ class AddArticle extends Component {
 
   async submit(flag = true) {
     if (this.state.loading) return
-    const { title, content, summary, coverSrc, tags, addTime, updTime } = this.state
+    const { title, content, summary, coverSrc, tags, addTime, updTime, defaultSrc } = this.state
     const selectedTag = []
     tags.forEach((ele) => {
       if (ele.selected) {
@@ -145,7 +148,7 @@ class AddArticle extends Component {
         title,
         content,
         summary,
-        coverSrc,
+        coverSrc: coverSrc || defaultSrc,
         tags: selectedTag,
         addTime: addTime && addTime.valueOf(),
         updTime: updTime && updTime.valueOf(),
@@ -222,7 +225,7 @@ class AddArticle extends Component {
                       return (
                         <Tag
                           color={ele.background}
-                          style={{ color: ele.color, cursor: 'pointer' }}
+                          style={{ color: ele.color, cursor: 'pointer', marginBottom: '10px' }}
                           icon={ele.selected ? <CheckOutlined /> : ''}
                           key={ele.name}
                           onClick={() => this.selectTag(ele)}

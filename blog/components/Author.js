@@ -1,6 +1,6 @@
 import { Avatar, Divider, Popover, Image } from 'antd'
 import '../static/style/components/author.less'
-import { WechatFilled, GithubFilled, QqCircleFilled } from '@ant-design/icons'
+import { WechatFilled, GithubFilled } from '@ant-design/icons'
 
 const Author = () => {
   return (
@@ -21,7 +21,6 @@ const Author = () => {
         <a href="https://github.com/Moon-Future/react-blog" target="_blank">
           <Avatar className="author-social" size={32} icon={<GithubFilled />} className="account" />
         </a>
-        <Avatar className="author-social" size={32} icon={<QqCircleFilled />} className="account" />
       </div>
     </div>
   )

@@ -1,0 +1,54 @@
+version: '3'
+services:
+  blog:
+    build:
+      context: ../blog
+      dockerfile: ./docker/Dockerfile
+    image: react_blog:blog
+    networks:
+      - react_blog
+    container_name: react_blog_blog
+  nginx:
+    build:
+      context: ../blog
+      dockerfile: ./docker/Dockerfile-nginx
+    image: react_blog:nginx
+    ports:
+      - 9000:80
+    volumes:
+      - ../blog/docker/nginx.conf:/etc/nginx/conf.d/nginx.conf
+    networks:
+      - react_blog
+    container_name: react_blog_nginx
+  admin:
+    build:
+      context: ../admin
+      dockerfile: ./docker/Dockerfile
+    image: react_blog:admin
+    ports:
+      - 9001:80
+    volumes:
+      - ../admin/build:/www
+      - ../admin/docker/nginx.conf:/etc/nginx/conf.d/nginx.conf
+    networks:
+      - react_blog
+    container_name: react_blog_admin
+  service:
+    build:
+      context: ../service
+      dockerfile: ./docker/Dockerfile
+    image: react_blog:service
+    ports:
+      - 9002:9002
+    restart: on-failure
+    environment:
+      MYSQL_HOST: 172.17.0.1
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 8023
+    volumes:
+      - ../service/article:/usr/src/app/article
+    networks:
+      - react_blog
+    container_name: react_blog_service
+networks:
+  react_blog:

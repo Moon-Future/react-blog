@@ -4,6 +4,7 @@ import { CalendarTwoTone, EyeTwoTone } from '@ant-design/icons'
 import { motion } from 'framer-motion'
 import Head from 'next/head'
 import Header from '../components/Header'
+import Footer from '../components/Footer'
 import Catalog from '../components/Catalog'
 import Author from '../components/Author'
 import Project from '../components/Project'
@@ -14,7 +15,7 @@ import 'highlight.js/styles/monokai-sublime.css'
 import '../static/style/pages/detailed.less'
 import { formatTime } from '../util/index'
 import axios from 'axios'
-import api from '../config/api'
+import { SSRAPI } from '../config/api'
 
 const postVariants = {
   initial: { x: 1000, opacity: 0 },
@@ -127,8 +128,8 @@ const Detailed = (props) => {
             <div className="markdown-content" dangerouslySetInnerHTML={{ __html: html }}></div>
           </motion.div>
         </Col>
+        <Footer />
       </Row>
-
       <ScrollTop />
     </div>
   )
@@ -137,7 +138,7 @@ const Detailed = (props) => {
 export async function getServerSideProps(context) {
   try {
     const id = context.query.id
-    const result = await axios.post(api.getArticle, { id })
+    const result = await axios.post(SSRAPI.getArticle, { id })
     return {
       props: { articleDetail: result.data }, // will be passed to the page component as props
     }

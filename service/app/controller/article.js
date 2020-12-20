@@ -13,7 +13,8 @@ class ArticleController extends Controller {
   // 获取文章列表
   async getArticleList() {
     const result = await this.app.mysql.select('article', {
-      where: { off: 0 }
+      where: { off: 0 },
+      orders: [['add_time', 'DESC']],
     })
     const tagAll = await this.app.mysql.select('tag')
     result.forEach((item) => {
@@ -34,6 +35,7 @@ class ArticleController extends Controller {
     const { id, allTag } = this.ctx.request.body
     const result = await this.app.mysql.get('article', { id: id })
     if (result) {
+      await this.app.mysql.update('article', { id: id, view: result.view + 1 })
       const tagSplit = result.tag.split(',')
       const tag = []
       const tagAll = await this.app.mysql.select('tag', {
@@ -73,7 +75,7 @@ class ArticleController extends Controller {
     if (id) {
       // 更新
       data.id = id
-      data.upd_time = updTime || Date.now()
+      data.upd_time = updTime
       const result = await this.app.mysql.get('article', { id })
       const res = await this.app.mysql.update('article', data)
       const insertSuccess = res.affectedRows === 1

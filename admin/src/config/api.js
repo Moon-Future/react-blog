@@ -1,4 +1,4 @@
-const HOST = 'http://127.0.0.1:9002'
+const HOST = process.env.NODE_ENV === 'development' ? 'http://localhost:9002' : ''
 
 const API = {
   getArticleList: HOST + '/api/getArticleList',
@@ -11,7 +11,9 @@ const API = {
   delTag: HOST + '/api/delTag',
 
   register: HOST + '/api/register',
-  login: HOST + '/api/login'
+  login: HOST + '/api/login',
+
+  checkAuth: HOST + '/api/checkAuth',
 }
 
 export default API

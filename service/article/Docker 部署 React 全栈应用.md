@@ -1,0 +1,2650 @@
+## 前言
+
+之前使用 Vue 全家桶开发了个人博客，并部署在阿里云服务器上，最近在学习 React，于是使用 React 开发重构了自己的博客。
+
+主要技术栈如下：
+
+- 前台页面：Next.js 搭建服务端渲染页面，利于 SEO
+- 后台管理界面：create-react-app 快速搭建
+- 服务接口：Egg.js + Mysql
+- 部署：Linux + Docker
+
+React 搭建博客前后台部分，这里不会细讲，只会说说中间遇到的一些问题和一些解决方法，具体开发教程可参考 [React Hooks+Egg.js实战视频教程-技术胖Blog开发](https://jspang.com/detailed?id=52)。
+
+部署部分这里会是重点讲解，因为也是第一次接触 Docker，这里只记录自己的学习心得，有不对的地方还请多多指教。
+
+恰好本次项目里前台页面是 node 运行，后台界面是静态 HTML，服务接口需要连接 Mysql，我觉得 Docker 来部署这几种情况也是比较全面的例子了，可以给后来同学作为参考，内容比较啰嗦，希望能帮助后来的同学少走一点坑，因为有些是自己的理解，可能会有错误，还请大家指正，互相学习。
+
+
+
+## 项目地址
+
+源码地址：https://github.com/Moon-Future/react-blog
+
+clone 下来参照目录哦~
+
+
+
+## 一、React 篇
+
+博客前台使用 Next.js 服务端渲染框架搭建，后台管理界面使用 create-react-app 脚手架搭建，服务接口使用 Egg 框架（基于 Koa）。后台管理和服务接口没什么好说的，就是一些 React 基础知识，这里主要说下 Next.js 中遇到的一些问题。
+
+> 项目目录：
+>
+> blog：前台界面，Next.js
+>
+> admin：后台管理界面，create-react-app 脚手架搭建
+>
+> service：前后台服务接口
+
+### 1. 获取渲染数据
+
+因为是服务端渲染，所以页面初始数据会在服务器端获取后，渲染页面后返回给前端，这里有两个官方 API，`getStaticProps`，`getServerSideProps`，从名字可以稍微看出一点区别。（Next.js 9.3 版本以上，使用 `getStaticProps` 或 `getServerSideProps` 来替代 `getInitialProps`。）
+
+**getStaticProps**：服务端获取静态数据，在获取数据后生成静态 HTML 页面，之后在每次请求时都重用此页面
+
+```js
+const Article = (props) => {
+
+    return ()
+}
+/* 也可
+export default class Article extends React.Component {
+
+    render() {
+        return
+    }
+}
+*/
+
+export async function getStaticProps(context) {
+    try {
+        const result = await axios.post(api.getArticleList)
+        return {
+            props: { articleList: result.data }, // will be passed to the page component as props
+        }
+    } catch (e) {
+        return {
+            props: { articleList: [] }, // will be passed to the page component as props
+        }
+    }
+}
+
+export default Article
+```
+
+**getServerSideProps**：每次请求时，服务端都会去重新获取获取生成 HTML 页面
+
+```js
+const Article = (props) => {
+
+    return ()
+}
+/* 也可
+export default class Article extends React.Component {
+
+    render() {
+        return
+    }
+}
+*/
+
+export async function getServerSideProps(context) {
+    try {
+        const result = await axios.post(api.getArticleList)
+        return {
+            props: { articleList: result.data }, // will be passed to the page component as props
+        }
+    } catch (e) {
+        return {
+            props: { articleList: [] }, // will be passed to the page component as props
+        }
+    }
+}
+
+export default Article
+```
+
+可以看到两者用法是一样的。  
+
+**开发模式**下 `npm run dev`，两者没什么区别，每次请求页面都会重新获取数据。  
+
+**生产环境**下，需要先`npm run build` 生成静态页面，使用 **getStaticProps** 获取数据的话就会在此命令下生产静态 HTML 页面，然后`npm run start`，后面每次请求都会重用静态页面，而使用 **getServerSideProps** 每次请求都会重新获取数据。
+
+**返回数据** 都是对象形式，且只能是对象，key 是 props，会传递到类或函数里面的 props。   
+
+博客这里因为是获取博客文章列表，数据随时可能变化，所以选用 **getServerSideProps** 。
+
+这里使用 try，catch 捕获异常，防止获取数据失败或者后端接口报错，服务端渲染错误返回不了页面。
+
+
+
+### 2. 页面加载后请求
+
+还有一些数据，我们并不希望在服务端获取渲染到页面里，而是希望页面加载后再操作。  
+
+**使用 React Hook**，可以在 `useEffect` 中操作：
+
+```js
+const Article = (props) => {
+
+    useEffect(async () => {
+		await axios.get('')
+    }, [])
+
+    return ()
+}
+
+export async function getServerSideProps(context) {
+    try {
+        const result = await axios.post(api.getArticleList)
+        return {
+            props: { articleList: result.data }, // will be passed to the page component as props
+        }
+    } catch (e) {
+        return {
+            props: { articleList: [] }, // will be passed to the page component as props
+        }
+    }
+}
+
+export default Article
+```
+
+这里**注意** `useEffect` 第二个参数，代表是否执行的依赖。
+
+- 不传第二个参数：每次 return 重新渲染页面时，useEffect 第一个参数函数都会执行
+- 传参 **[]**，如上：代表不依赖任何变量，只执行一次
+- 传参 **[value]**，数组，可以依赖多个变量：代表依赖 value 变量（state 中的值），只在 value 值改变时，执行 useEffect 第一个参数函数
+
+
+
+**使用 Class**，可以在 `componenDidMount` 中操作：
+
+```js
+export default class Article extends React.Component {
+
+    componenDidMount() {
+        await axios.get('')
+    }
+    
+    render() {
+        return
+    }
+}
+
+export async function getServerSideProps(context) {
+    try {
+        const result = await axios.post(api.getArticleList)
+        return {
+            props: { articleList: result.data }, // will be passed to the page component as props
+        }
+    } catch (e) {
+        return {
+            props: { articleList: [] }, // will be passed to the page component as props
+        }
+    }
+}
+
+export default Article
+```
+
+
+
+### 3. 页面动画
+
+页面进入、退出动画找到一个比较好用的库 **framer-motion**， [https://www.framer.com/api/motion/](https://www.framer.com/api/motion/)
+
+先改造一下 pages/_app.js，引入 framer-motion
+
+```shell
+npm install framer-motion -S
+```
+
+```js
+import { AnimatePresence } from 'framer-motion'
+
+export default function MyApp({ Component, pageProps, router }) {
+  return (
+    <AnimatePresence exitBeforeEnter>
+      <Component {...pageProps} route={router.route} key={router.route} />
+    </AnimatePresence>
+  )
+}
+```
+
+在每个页面里通过在元素标签前加 motion 实现动画效果，如 pages/article.js 页面
+
+```js
+const postVariants = {
+  initial: { scale: 0.96, y: 30, opacity: 0 },
+  enter: { scale: 1, y: 0, opacity: 1, transition: { duration: 0.5, ease: [0.48, 0.15, 0.25, 0.96] } },
+  exit: {
+    scale: 0.6,
+    y: 100,
+    opacity: 0,
+    transition: { duration: 0.5, ease: [0.48, 0.15, 0.25, 0.96] },
+  },
+}
+
+const sentenceVariants = {
+  initial: { scale: 0.96, opacity: 1 },
+  exit: {
+    scale: 0.6,
+    y: 100,
+    x: -300,
+    opacity: 0,
+    transition: { duration: 0.5, ease: [0.48, 0.15, 0.25, 0.96] },
+  },
+}
+
+const Article = (props) => {
+  const { articleList, route } = props
+  const [poetry, setPoetry] = useState(null)
+
+  const getPoetry = (data) => {
+    setPoetry(data)
+  }
+
+  return (
+    <div className="container article-container">
+      <Head>
+        <title>学无止境，厚积薄发</title>
+      </Head>
+
+      <Header route={route} />
+
+      <div className="page-background"></div>
+      <div style={{ height: '500px' }}></div>
+
+      <Row className="comm-main comm-main-index" type="flex" justify="center">
+        <Col className="comm-left" xs={0} sm={0} md={0} lg={5} xl={4} xxl={3}>
+          <Author />
+          <Project />
+          <Poetry poetry={poetry} />
+        </Col>
+
+        <Col className="comm-center" xs={24} sm={24} md={24} lg={16} xl={16} xxl={16}>
+          <motion.div className="sentence-wrap" initial="initial" animate="enter" exit="exit" variants={sentenceVariants}>
+            <PoetrySentence staticFlag={true} handlePoetry={getPoetry} />
+          </motion.div>
+          <div className="comm-center-bg"></div>
+          <motion.div initial="initial" animate="enter" exit="exit" variants={postVariants} className="comm-center-content">
+            <BlogList articleList={articleList} />
+          </motion.div>
+        </Col>
+      </Row>
+    </div>
+  )
+}
+```
+
+需要实现动画效果的元素标签前加上 motion，在传入 initial，animate，exit，variants 等参数，variants 中 
+
+```js
+const postVariants = {
+  initial: { scale: 0.96, y: 30, opacity: 0 },
+  enter: { scale: 1, y: 0, opacity: 1, transition: { duration: 0.5, ease: [0.48, 0.15, 0.25, 0.96] } },
+  exit: {
+    scale: 0.6,
+    y: 100,
+    opacity: 0,
+    transition: { duration: 0.5, ease: [0.48, 0.15, 0.25, 0.96] },
+  },
+}
+// initial 初始状态
+// enter 进入动画
+// exit 退出状态
+// 不想有退出动画，不写 exit 变量即可
+```
+
+**注意**：这里使用 AnimatePresence 改造了 _app.js 后，每个页面都要使用到 motion，否则页面切换不成功，不想要动画的可以如下给默认状态即可：
+
+```js
+const Article = (props) =>{
+    return (
+    	<motion.div initial="initial" animate="enter" exit="exit">
+        	...
+        </motion.div>
+    )
+}
+```
+
+
+
+### 4. 页面切换状态
+
+在 Next.js 中使用 `import Link from 'next/link'` 可以实现不刷新页面切换页面
+
+```js
+import Link from 'next/link'
+
+const BlogList = (props) => {
+  return (
+    <>
+      <Link href={'/detailed?id=' + item.id}>
+        <div className="list-title">{item.title}</div>
+      </Link>
+    </>
+  )
+}
+
+export default BlogList
+```
+
+因为是在服务端渲染，在点击 Link 链接时，页面会有一段时间没任何反应，Next.js 默认会在右下角有一个转动的黑色三角，但实在是引不起用户注意。
+
+这里使用插件 **nprogress**，实现顶部加载进度条
+
+```shell
+npm install nprogress -S
+```
+
+还是改造 _app.js
+
+```js
+import 'antd/dist/antd.css'
+import '../static/style/common.less'
+import { AnimatePresence } from 'framer-motion'
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
+import Router from 'next/router'
+
+NProgress.configure({
+  minimum: 0.3,
+  easing: 'ease',
+  speed: 800,
+  showSpinner: false,
+})
+Router.events.on('routeChangeStart', () => NProgress.start())
+Router.events.on('routeChangeComplete', () => NProgress.done())
+Router.events.on('routeChangeError', () => NProgress.done())
+
+export default function MyApp({ Component, pageProps, router }) {
+  return (
+    <AnimatePresence exitBeforeEnter>
+      <Component {...pageProps} route={router.route} key={router.route} />
+    </AnimatePresence>
+  )
+}
+```
+
+主要使用到 next/router 去监听路由切换状态，这里也可以自定义加载状态。
+
+
+
+### 5. 页面 CSS 加载失败
+
+在 Next.js 开发模式下，当第一次进入某个页面时，发现当前页面样式加载失败，必须刷新一下才能加载成功。
+
+[next-css: Routing to another page doesn't load CSS in development mode](https://github.com/vercel/next-plugins/issues/263)
+
+[Cant change page with 'next/link' & 'next-css'](https://github.com/vercel/next-plugins/issues/282)
+
+在 Github 上也查到相关问题，说是在 _app.js 都引入一下，但是我试了下，还是不行，不过好在这种情况只在开发模式下，生产模式下没什么问题，所以也就没在折腾了，就这样刷新一下吧。
+
+
+
+### 6. React Hoos 中实现 setInterval
+
+在 components/PoetrySentence.js 中实现动态写一句诗的效果，在 class 中可以同通过 setInterval 简单实现，但在 React Hoot 中每次 render 重新渲染后都会执行 useEffect，或者 useEffect 依赖[] 就又只会执行一次，这里就通过依赖单一变量加 setTimeout 实现。
+
+在 components/PoetrySentence.js 中
+
+```js
+import { useState, useEffect } from 'react'
+import { RedoOutlined } from '@ant-design/icons'
+import { getPoetry, formatTime } from '../util/index'
+
+const PoetrySentence = (props) => {
+  const [sentence, setSentence] = useState('')
+  const [finished, setFinished] = useState(false)
+  const [words, setWords] = useState(null)
+  const { staticFlag, handlePoetry } = props // 是否静态展示
+
+  useEffect(
+    async () => {
+      if (words) {
+        if (words.length) {
+          setTimeout(() => {
+            setWords(words)
+            setSentence(sentence + words.shift())
+          }, 150)
+        } else {
+          setFinished(true)
+        }
+      } else {
+        let tmp = await todayPoetry()
+        if (staticFlag) {
+          setFinished(true)
+          setSentence(tmp.join(''))
+        } else {
+          setWords(tmp)
+          setSentence(tmp.shift())
+        }
+      }
+    },
+    [sentence]
+  )
+
+  const todayPoetry = () => {
+    return new Promise((resolve) => {
+      const now = formatTime(Date.now(), 'yyyy-MM-dd')
+      let poetry = localStorage.getItem('poetry')
+      if (poetry) {
+        poetry = JSON.parse(poetry)
+        if (poetry.time === now) {
+          handlePoetry && handlePoetry(poetry)
+          resolve(poetry.sentence.split(''))
+          return
+        }
+      }
+      getPoetry.load((result) => {
+        poetry = {
+          time: now,
+          sentence: result.data.content,
+          origin: {
+            title: result.data.origin.title,
+            author: result.data.origin.author,
+            dynasty: result.data.origin.dynasty,
+            content: result.data.origin.content,
+          },
+        }
+        handlePoetry && handlePoetry(poetry)
+        localStorage.setItem('poetry', JSON.stringify(poetry))
+        resolve(poetry.sentence.split(''))
+      })
+    })
+  }
+
+  const refresh = () => {
+    getPoetry.load((result) => {
+      const poetry = {
+        time: formatTime(Date.now(), 'yyyy-MM-dd'),
+        sentence: result.data.content,
+        origin: {
+          title: result.data.origin.title,
+          author: result.data.origin.author,
+          dynasty: result.data.origin.dynasty,
+          content: result.data.origin.content,
+        },
+      }
+      handlePoetry && handlePoetry(poetry)
+      localStorage.setItem('poetry', JSON.stringify(poetry))
+      if (staticFlag) {
+        setSentence(poetry.sentence)
+      } else {
+        setFinished(false)
+        setWords(null)
+        setSentence('')
+      }
+    })
+  }
+
+  return (
+    <p className="poetry-sentence">
+      {sentence}
+      {finished ? <RedoOutlined style={{ fontSize: '14px' }} onClick={() => refresh()} /> : null}
+      <span style={{ visibility: finished ? 'hidden' : '' }}>|</span>
+    </p>
+  )
+}
+
+export default PoetrySentence
+```
+
+useEffect 依赖变量 sentence，在 useEffect 中又去更改 sentence，sentence 更新后触发重新渲染，又会重新执行 useEffect，在 useEffect 中加上 setTimeout 延迟，刚好完美实现了 setInterval 效果。
+
+### 7. node-sass
+
+原本项目中使用的是 sass，但在后面 docker 部署安装依赖时，实在时太慢了，还各种报错，之前也是经常遇到，所以索性直接换成了 less，语法也差不多，安装起来省心多了。
+
+
+
+## 二、Docker 篇
+
+### 1. 什么是 Docker
+
+Docker 是一个开源的应用容器引擎，可以让开发者打包他们的应用以及依赖包到一个轻量级、可移植的容器中，然后发布到任何流行的 Linux 机器上，也可以实现虚拟化。
+
+容器是完全使用沙箱机制，相互之间不会有任何接口（类似 iPhone 的 app），更重要的是容器性能开销极低。
+
+### 2. 为什么要使用 Docker
+
+对我而言，因为现在使用的是阿里云服务器，部署了好几个项目，如果服务器到期后，更换服务器的话，就需要将所有项目全部迁移到新服务器，每个项目又要去依次安装依赖，运行，nginx 配置等等，想想都头大。而使用 Docker 后，将单个项目与其依赖打包成镜像，镜像可以在任何 Linux 中生产一个容器，迁移部署起来就方便多了。
+
+其他而已，使用 Docker 可以让开发环境、测试环境、生产环境一致，并且每个容器都是一个服务，也方便后端实现微服务架构。
+
+### 3. 安装
+
+Docker 安装最好是参照官方文档，避免出现版本更新问题。[https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/) 英文吃力的，这两推荐一款神奇词典 [欧陆词典](https://www.eudic.net/v4/en/app/eudic)，哪里不会点哪里，谁用谁说好。
+
+Mac 和 Windows 都有客户端，可以很简单的下载安装，另外 Window 注意区分专业版、企业版、教育版、家庭版
+
+[Window 专业版、企业版、教育版](https://docs.docker.com/docker-for-windows/install/)
+
+[Window 家庭版](https://docs.docker.com/docker-for-windows/install-windows-home/)
+
+因为我这里使用的是阿里云 Centos 7 服务器，所以简单介绍一下在 Centos 下的安装。
+
+
+
+#### Centos 安装 Docker
+
+首先若已经安装过 Docker，想再装最新版，先协助旧版
+
+```shell
+$ sudo yum remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-engine
+```
+
+有三种安装方式：
+
+1. **Install using the repository**
+2. **Install from a package**
+3. **Install using the convenience script**
+
+这里选择官方推荐的第一种方式安装 **Install using the repository**。
+
+
+
+1、**SET UP THE REPOSITORY**
+
+安装 yum-utils 工具包，设置存储库
+
+```shell
+$ sudo yum install -y yum-utils
+$ sudo yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo
+```
+
+2、**安装 docker**
+
+```shell
+$ sudo yum install docker-ce docker-ce-cli containerd.io
+```
+
+这样安装的是最新的版本，也可以选择指定版本安装
+
+查看版本列表：
+
+```shell
+$ yum list docker-ce --showduplicates | sort -r
+
+Loading mirror speeds from cached hostfile
+Loaded plugins: fastestmirror
+Installed Packages
+docker-ce.x86_64            3:20.10.0-3.el7                    docker-ce-stable 
+docker-ce.x86_64            3:20.10.0-3.el7                    @docker-ce-stable
+docker-ce.x86_64            3:19.03.9-3.el7                    docker-ce-stable 
+docker-ce.x86_64            3:19.03.8-3.el7                    docker-ce-stable 
+docker-ce.x86_64            3:19.03.7-3.el7                    docker-ce-stable 
+docker-ce.x86_64            3:19.03.6-3.el7                    docker-ce-stable 
+docker-ce.x86_64            3:19.03.5-3.el7                    docker-ce-stable 
+docker-ce.x86_64            3:19.03.4-3.el7                    docker-ce-stable 
+docker-ce.x86_64            3:19.03.3-3.el7                    docker-ce-stable 
+docker-ce.x86_64            3:19.03.2-3.el7                    docker-ce-stable 
+docker-ce.x86_64            3:19.03.14-3.el7                   docker-ce-stable
+......
+```
+
+选择指定版本安装
+
+```shell
+$ sudo yum install docker-ce-<VERSION_STRING> docker-ce-cli-<VERSION_STRING> containerd.io
+```
+
+安装完成，查看版本
+
+```shell
+$ docker -v
+Docker version 20.10.0, build 7287ab3
+```
+
+3、启动 docker
+
+```shell
+$ sudo systemctl start docker
+```
+
+关闭 docker
+
+```shell
+$ sudo systemctl stop docker
+```
+
+重启 docker
+
+```shell
+$ sudo systemctl restart docker
+```
+
+
+
+### 4. 镜像 Image
+
+**Docker 把应用程序及其依赖，打包在 image 文件里面。**只有通过这个文件，才能生成 Docker 容器（**Container**）。image 文件可以看作是容器的模板。Docker 根据 image 文件生成容器的实例。同一个 image 文件，可以生成多个同时运行的容器实例。
+
+image 文件是通用的，一台机器的 image 文件拷贝到另一台机器，照样可以使用。一般来说，为了节省时间，我们应该尽量使用别人制作好的 image 文件，而不是自己制作。即使要定制，也应该基于别人的 image 文件进行加工，而不是从零开始制作。
+
+官方有个镜像库 [Docker Hub](https://hub.docker.com/)，很多环境镜像都可以从上面拉取。
+
+
+
+#### 4.1 查看镜像
+
+```shell
+$ docker images
+```
+
+或者
+
+```shell
+$ docker image ls
+```
+
+刚安装完 docker，是没有任何镜像的
+
+```shell
+$ docker image ls
+REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
+```
+
+只**查看全部镜像 id**
+
+```shell
+$ docker images -q
+# 或
+$ docker image ls -q
+```
+
+
+
+#### 4.2 下载镜像
+
+这里我们尝试从官方库下载一个 nginx 镜像，镜像有点类似与 npm 全局依赖，拉取后，后面所有需要使用的 nginx 的镜像都可以依赖此 nginx，不用再重新下载，刚开始学习时，我还以为每个使用到 nginx 的镜像都要重新下载呢。
+
+下载 nginx 镜像 [https://hub.docker.com/_/nginx](https://hub.docker.com/_/nginx)
+
+```shell
+$ docker pull nginx
+Using default tag: latest
+latest: Pulling from library/nginx
+6ec7b7d162b2: Pull complete 
+cb420a90068e: Pull complete 
+2766c0bf2b07: Pull complete 
+e05167b6a99d: Pull complete 
+70ac9d795e79: Pull complete 
+Digest: sha256:4cf620a5c81390ee209398ecc18e5fb9dd0f5155cd82adcbae532fec94006fb9
+Status: Downloaded newer image for nginx:latest
+docker.io/library/nginx:latest
+
+$ docker images
+REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
+nginx        latest    ae2feff98a0c   13 hours ago   133MB
+
+```
+
+docker images 查看刚刚安装的 nginx 镜像，有 5 个title，分别为镜像名称，标签，id，创建时间，大小，其中 TAG 标签默认为 latest 最新版，如果下载指定版本，可以 : 后跟版本号
+
+```shell
+$ docker pull nginx:1.19
+```
+
+
+
+#### 4.3 删除镜像
+
+删除镜像可以使用如下命令
+
+```shell
+$ docker rmi [image]
+```
+
+或者
+
+```shell
+$ docker image rm [image]
+```
+
+[image] 可以是镜像名称+标签，也可以是镜像 id，ru
+
+```shell
+$ docker rmi nginx:latest
+$ docker rmi ae2feff98a0c
+```
+
+**删除所有镜像**
+
+```shell
+$ docker rmi $(docker images -q)
+```
+
+**删除所有 none 镜像**
+
+后面有些操作会重复创建相同的镜像，原本的镜像就会被覆盖变为 <none> ，可以批量删除
+
+```shell
+$ docker rmi $(docker images | grep "none" | awk '{print $3}')
+```
+
+
+
+#### 4.4 制作镜像
+
+上面我们下载了 nginx 镜像，但是要想运行我们自己的项目，我们还要制作自己项目的镜像，然后来生成容器才能运行项目。
+
+制作镜像需要借助 Dockerfile 文件，以本项目 admin 后台界面为例（也可以任何 html 文件），因为其打包后只需使用到 nginx 即可访问。
+
+先在 admin 下运行命令 `npm run build` 打包生成 build 文件夹，下面包好 index.html 文件，在 admin/docker 文件夹下创建 Dockerfile 文件，内容如下
+
+```dockerfile
+FROM nginx
+
+COPY ../build /usr/share/nginx/html
+
+EXPOSE 80
+```
+
+将 build，docker 两个文件夹放在服务器同一目录下，如 /dockerProject/admin
+
+```
+├─admin
+  └─build
+    └─index.html
+  └─docker
+    └─Dockerfile
+```
+
+在 docker 目录下运行命令
+
+```shell
+$ docker build ./ -t admin:v1
+
+Sending build context to Docker daemon  4.096kB
+Step 1/3 : FROM nginx
+ ---> ae2feff98a0c
+Step 2/3 : COPY ../build /usr/share/nginx/html
+COPY failed: forbidden path outside the build context: ../build ()
+```
+
+./ 基于当前目录为构建上下文， -t 指定制作的镜像名称。
+
+可以看到上面报错了，
+
+> The path must be inside the context of the build; you cannot ADD ../something/something, because the first step of a docker build is to send the context directory (and subdirectories) to the docker daemon.
+
+上面大意是确定构建上下文后，中间的一些文件操作就只能在当前上下文之间进行，有两种方式解决
+
+1. **Dockfile 与 build 同目录**
+
+   ```
+   ├─admin
+     └─build
+       └─index.html
+     └─Dockerfile
+   ```
+
+   Dockerfile：
+
+   ```dockerfile
+   FROM nginx
+   
+   COPY ./build /usr/share/nginx/html
+   
+   EXPOSE 80
+   ```
+
+   在 **admin 目录**下执行命令
+
+   ```shell
+   $ docker build ./ -t admin:v1
+   
+   Sending build context to Docker daemon  3.094MB
+   Step 1/3 : FROM nginx
+    ---> ae2feff98a0c
+   Step 2/3 : COPY ./build /usr/share/nginx/html
+    ---> Using cache
+    ---> 0e54c36f5d9a
+   Step 3/3 : EXPOSE 80
+    ---> Using cache
+    ---> 60db346d30e3
+   Successfully built 60db346d30e3
+   Successfully tagged admin:v1
+   ```
+
+2. **依然将 Dokcerfile 放入 docker 中统一管理**
+
+   ```
+   ├─admin
+     └─build
+       └─index.html
+     └─docker
+       └─Dockerfile
+   ```
+
+   Dockerfile：
+
+   ```dockerfile
+   FROM nginx
+   
+   COPY ./build /usr/share/nginx/html
+   
+   EXPOSE 80
+   ```
+
+   在 **admin 目录**下执行命令
+
+   ```shell
+   $ docker build -f docker/Dockerfile ./ -t admin:v1
+   
+   Sending build context to Docker daemon  3.094MB
+   Step 1/3 : FROM nginx
+    ---> ae2feff98a0c
+   Step 2/3 : COPY ./build /usr/share/nginx/html
+    ---> Using cache
+    ---> 0e54c36f5d9a
+   Step 3/3 : EXPOSE 80
+    ---> Using cache
+    ---> 60db346d30e3
+   Successfully built 60db346d30e3
+   Successfully tagged admin:v1
+   ```
+
+   注意这里的 ./build 路径。-f (-file)指定一个 Dockfile 文件，./ 以当前路径为构建上下文，所以 build 路径还是 ./build
+
+
+
+上面使用到了 Dockerfile 文件，因为内容比较少，这里先不介绍，后面部署 Next.js 时在稍作说明。
+
+
+
+### 5. 容器 Container
+
+上面生成了 admin:v1 镜像，我们查看一下
+
+```shell
+$ docker images
+REPOSITORY   TAG       IMAGE ID       CREATED          SIZE
+admin        v1        60db346d30e3   51 minutes ago   136MB
+nginx        latest    ae2feff98a0c   14 hours ago     133MB
+```
+
+可以看到多了 admin:v1 镜像，且在上面构建镜像时步骤 Step 1 ，速度很快，直接使用了之前下载的 nginx 镜像，如果之前没下载，这里就会去下载。
+
+项目运行在容器内，我们需要通过一个镜像创建一个容器。
+
+
+
+#### 5.1 查看容器
+
+```shell
+$ docker container ls
+CONTAINER ID   IMAGE      COMMAND       CREATED          STATUS          PORTS          NAMES
+```
+
+或
+
+```shell
+$ docker ps
+CONTAINER ID   IMAGE      COMMAND       CREATED          STATUS          PORTS          NAMES	
+```
+
+这两个命令只显示正在运行的容器，报错停止的都不会显示，加上 -a (--all) 参可以显示全部
+
+```shell
+$ docker container ls -a
+$ docker ps -a
+```
+
+只**查看所有容器 id**
+
+```shell
+$ docker ps -aq
+```
+
+
+
+#### 5.2 生成容器
+
+这里我们通过 admin:v1 来生成一个容器
+
+```shell
+$ docker create -p 9001:80 --name admin admin:v1
+```
+
+- -p：端口映射，宿主机(服务器) : 容器，9001:80 代表宿主机 9000 端口可以访问到容器的 80 端口
+- --name：生成的容器名称，唯一值
+- admin:v1：使用的镜像，标签 `:v1` 默认为 `:latest`
+
+还有很多参数，可自行了解 [https://docs.docker.com/engine/reference/commandline/create/#options](https://docs.docker.com/engine/reference/commandline/create/#options)
+
+生成容器后，咱们来看看
+
+```shell
+$ docker ps -a
+CONTAINER ID   IMAGE      COMMAND                  CREATED         STATUS    PORTS     NAMES
+8d755bab5c73   admin:v1   "/docker-entrypoint.…"   5 minutes ago   Created             admin
+```
+
+可以看到容器已经生成，但还没有运行，所有使用 `docker ps` 是看不到的
+
+运行容器：`docker start [container iD]`，【】里面可以使用容器 ID，也可以使用容器名称，都是唯一的
+
+```shell
+$ docker start admin
+
+$ docker ps -a
+CONTAINER ID   IMAGE      COMMAND                CREATED         STATUS         PORTS                 NAMES
+8d755bab5c73   admin:v1   "/docker-entrypoint.…"   8 minutes ago   Up 3 seconds  0.0.0.0:9001->80/tcp admin
+```
+
+容器已经运行，此时通过服务器ip + 9001 端口（Mac、Windows 直接 localhost:9001）即可访问到容器内部。
+
+以上生成容器，运行容器也可以一条命令
+
+```shell
+$ docker run -p 9001:80 --name admin admin:v1
+```
+
+
+
+#### 5.3 删除容器
+
+删除容器可以使用如下命令
+
+```shell
+$ docker rm admin # id 或 name
+```
+
+如果容器在运行中，要先停止容器
+
+```shell
+$ docker stop admin
+```
+
+或者强制删除
+
+```shell
+$ docker rm -f admin
+```
+
+**停止所有容器**
+
+```shell
+$ docker stop $(docker ps -aq)
+```
+
+**删除所有容器**
+
+```shell
+$ docker rm $(docker ps -aq)
+```
+
+**停止并删除所有容器**
+
+```shell
+$ docker stop $(docker ps -aq) & docker rm $(docker ps -aq)
+```
+
+
+
+#### 5.4 容器日志
+
+运行容器时如果失败，可以查看日志定位错位
+
+```shell
+$ docker logs admin
+```
+
+
+
+#### 5.5 进入容器内部
+
+容器就像一个文件系统，我们也可以进去查看里面的文件，使用以下命令进入容器内部
+
+```shell
+$ docker exec -it admin /bin/sh
+```
+
+- `-i` 参数让容器的标准输入持续打开，--interactive
+- `-t` 参数让 Docker 分配一个伪终端，并绑定到容器的标准输入上， --tty
+- admin： 容器 id 或名字
+
+进入容器内部后，可以使用 Linux 命令访问内部文件
+
+```shell
+$ ls
+bin  boot  dev	docker-entrypoint.d  docker-entrypoint.sh  etc	home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+
+$ cd usr/share/nginx/html
+$ ls
+50x.html  asset-manifest.json  favicon.ico  index.html	manifest.json  robots.txt  static
+```
+
+进入 nginx 默认 html 目录 usr/share/nginx/html，可以看到我们通过 Dockfile 拷贝过来的文件
+
+
+
+### 6. docker-compose
+
+通过上面可以发现每次制作镜像，生成容器，运行容器，都要输入很多命令，实在是很不方便，如果只要一个简单的命令就能完成就好了，docker-compose 就可以实现，当然，这只是它很小的一部分功能。
+
+官方简介如下：
+
+> Compose 是用于定义和运行多容器 Docker 应用程序的工具。通过Compose，您可以使用 YAML 文件来配置应用程序的服务。然后，使用一个命令，就可以从配置中创建并启动所有服务。
+>
+>
+> 使用Compose基本上是一个三步过程：
+>
+> - 使用 Dockerfile 定义应用程序的环境，以便可以在任何地方复制它。
+> - 在 docker-compose.yml 中定义组成您的应用程序的服务，以便它们可以在隔离的环境中一起运行。
+> - 运行 docker-compose up，然后 Compose 启动并运行整个应用程序。
+
+
+
+#### 6.1 安装 docker-compose
+
+参考官方文档 [Install Docker Compose](https://docs.docker.com/compose/install/) ，这里简单介绍 Linux 安装
+
+1. 运行命令
+
+   ```shell
+   sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+   ```
+
+   若是安装慢，可以用 daocloud 下载
+
+   ```shell
+   sudo curl -L https://get.daocloud.io/docker/compose/releases/download/1.25.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+   ```
+
+2. 添加可执行权限
+
+   ```shell
+   sudo chmod +x /usr/local/bin/docker-compose
+   ```
+
+3. 检查是否安装完成
+
+   ```shell
+   docker-compose --version
+   ```
+
+   
+
+#### 6.2 docker-compose.yml
+
+docker-compose.yml 是 docker-compose 运行时使用文件，里面配置了镜像和容器一些参数，这里来实现上面创建镜像，生成容器，运行容器。
+
+```yaml
+version: '3'
+services:
+  admin:
+    build: 
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    image: admin:v1
+    ports: 
+      - 9001:80
+    container_name: admin
+```
+
+配置参数有很多 [https://docs.docker.com/compose/compose-file/](https://docs.docker.com/compose/compose-file/)，官网可以详解，这里以及后面只说说用到的一些配置。
+
+- varsion：可选 1，2，2.x，3.x
+- services：服务组
+  - admin：服务名称，唯一，多个 docker-compose.yml 有相同名称的，下面的容器会覆盖
+    - build：构建参数，如果 docker-compose.yml、Dockfile 都和 built 文件加目录，可直接 ./ ，当前构建上下文，当前 Dockerfile；如果 docker-compose.yml、Dockfile 都放在 docker 文件夹下，则需指定构建上下文 context 和 dokcerfile
+    - context：构建上下文
+    - dockerfile：指定 dockerfile 路径
+  - image：指定使用的镜像，如果镜像存在，会直接使用镜像，否则的话通过上面的 dockerfile 构建
+  - ports：端口映射，可多个。文件中 - 就代表参数是数组形式，可以多个
+  - container_name：容器名字，若不指定，这默认为 当前目录_admin_index （admin：服务名，index：数字，累加，一个服务可以有可以容器，不同 docker-compose.yml 里有相同服务）
+
+**将 docker-compose.yml 放入 docker 目录下**
+
+```
+├─admin
+  └─build
+    └─index.html
+  └─docker
+    └─Dockerfile
+    └─docker-compose.yml
+```
+
+在 docker 目录下运行
+
+```shell
+$ docker-compose up -d --build
+```
+
+- -d：代表在后台守护运行，不加 -d 的话，会显示构建过程，最后完成只能 Ctrl + C 退出，容器也就停止了，要再去启动容器
+- **--build**：表示每次构建都重新执行一遍 Dockerfile 生成镜像（会重新安装 npm 包），不加的话如果镜像存在的话，就不会再执行 Dockerfile，一般是 Dockerfile 有变动时加上 --build
+
+**docker-compose 与 build 同目录**
+
+```
+├─admin
+  └─build
+    └─index.html
+  └─Dockerfile
+  └─docker-compose.yml
+```
+
+则，docker-compose.yml
+
+```yaml
+version: '3'
+services:
+  admin:
+    build: ./
+    image: admin:v1
+    ports: 
+      - 9001:80
+    container_name: admin
+```
+
+在 build 目录下运行
+
+```shell
+$ docker-compose up -d --build
+```
+
+
+
+## 三、部署篇
+
+上面简单介绍了 docker 的一些用法，借用静态 HTML 文件与 nignx 镜像创建运行了一个容器，但是其远远不止这些，下面就通过部署本博客来作为例子再探探里面的一些知识点。
+
+源码地址：https://github.com/Moon-Future/react-blog，可下载下来看着目录更清晰。
+
+为了统一维护 docker 文件，以下将 docker 相关文件都放在各自目录下 docker 文件下，所以要特别主题构建上下文（context）的确定。
+
+### 1. 部署前台 blog
+
+> 端口映射 9000:9000，服务器端口:容器端口，若是线上服务器，要先在安全组里开通对应的端口号
+
+在 blog 目录下创建 docker 目录，docker 目录下创建三个文件
+
+- .dockerignore：拷贝文件忽略列表
+- Dockefile
+- docker-compose.yml
+
+***.dockerignore***
+
+```
+node_modules
+.next
+```
+
+
+
+***Dockefile***
+
+```dockerfile
+# node 镜像
+# apline 版本的node会小很多
+FROM node:12-alpine
+
+# 在容器中创建目录
+RUN mkdir -p /usr/src/app
+
+# 指定工作空间，后面的指令都会在当前目录下执行
+WORKDIR /usr/src/app
+
+# 拷贝 package.json
+COPY package.json /usr/src/app
+
+# 安装依赖
+RUN npm i --production --registry=https://registry.npm.taobao.org
+
+# 拷贝其他所有文件到容器（除了 .dockerignore 中的目录和文件）
+COPY . /usr/src/app
+
+# build
+RUN npm run build
+
+# 暴露端口 9000
+EXPOSE 9000
+
+# 运行容器时执行命令，每个 Dokcerfile 只能有一个 CMD 命令，多个的话只有最后一个会执行
+CMD [ "npm", "start" ]
+```
+
+> Docker 镜像是分层的，下面这些知识点非常重要：
+>
+> - Dockerfile 中的每个指令都会创建一个新的镜像层，每个 RUN 都是一个指令 https://docs.docker.com/engine/reference/builder/#run
+> - 镜像层将被缓存和复用
+> - 当 Dockerfile 的指令修改了，复制的文件变化了，或者构建镜像时指定的变量不同了，对应的镜像层缓存就会失效
+> - 某一层的镜像缓存失效之后，它之后的镜像层缓存都会失效
+> - 镜像层是不可变的，如果我们再某一层中添加一个文件，然后在下一层中删除它，则镜像中依然会包含该文件(只是这个文件在 Docker 容器中不可见了)。
+>
+> 所以我们先拷贝 package.json，然后 RUN npm i 安装依赖，形成一个镜像层，再拷贝其他所有文件，形成一个镜像层，之后如果代码有所变动，但是 package.json 没有变动，再次执行时，就不会再安装依赖了，可以节省很多时间。package.json 有变动，才会重新执行 RUN run i 安装依赖。
+>
+> 假如生成了镜像 imageA，此时要删除 imageA，重新生成，记住先生成新的镜像 imageB，这样才会复用 npm 包，如果先删除了 imageA，再新生成 imageB，则又会重新安装依赖。
+
+在 blog 目录下运行以下命令可以生成镜像 react_blog:blog
+
+```shell
+$ docker build -f docker/Dockerfile . -t react_blog:blog
+```
+
+第一次运行安装依赖时有点慢（有个 sharp 特别慢...），刚开始我使用 node-sass 时，安装总是报错，后来索性就换成了 less，省心。如果想用 yarn 安装的话，这里 Dockerfile 里 npm 相关的命令也可以换成对于的 yarn 命令。
+
+漫长的等待后终于 build 成功，下面一些信息就是 npm run build 生成的文件
+
+![image-20201217110814789](https://cloud-images-1255423800.cos.ap-guangzhou.myqcloud.com/Docker-01.png)
+
+看看生成的镜像
+
+```shell
+$ docker images
+REPOSITORY   TAG         IMAGE ID       CREATED         SIZE
+react_blog   blog        fef06dfed97f   3 minutes ago   329MB
+nginx        latest      ae2feff98a0c   31 hours ago    133MB
+node         12-alpine   844f8bb6a3f8   3 weeks ago     89.7MB
+```
+
+然后来生成并运行容器
+
+```shell
+$ docker run -itd -p 9000:9000 --name react_blog_blog react_blog:blog
+```
+
+这里参数再说明一下：
+
+- `-i` 参数让容器的标准输入持续打开，--interactive
+- `-t` 参数让 Docker 分配一个伪终端，并绑定到容器的标准输入上， --tty
+- `-d` 参数让容器在后台，以守护进程的方式执行，--detach（Run container in background and print container ID） 
+- `--name` 参数指定容器唯一名称，若不指定，则随机一个名称
+
+-it 一般同时加上，-d 参数如果不加的话，运行容器成功时，会进入一个终端命令界面，要想退出的话只能 Ctrl + C，退出之后容器也就退出了，`docker ps -a` 可以看到容器状态是 `Exited (0)` ，可以使用 `docker start container` 再次开启。加上 -d 的话容器就会直接在后台运行，一般的话就加上 -d。大家可以试试，之后再删除容器就可以了。
+
+![image-20201217112605886](https://cloud-images-1255423800.cos.ap-guangzhou.myqcloud.com/Docker-02.png)
+
+以上容器运行成功的话，在浏览器通过 `服务器ip:9000` 就可以访问到页面啦，Mac 或者 Windows 本地的话 `localhost:9000` 就可以访问啦。
+
+
+
+***docker-compose.yml***
+
+```yml
+version: '3'
+services:
+  web:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    image: react_blog:blog
+    ports:
+      - 9000:9000
+    container_name: react_blog_blog
+```
+
+上面咱们通过 `docker build`，`docker run` 等命令先生成容器，再生成并运行容器，是不是有点繁琐，命令不好记，输入也麻烦，这里我们就可以利用 docker-compose 来简化执行命令。
+
+我们看一下文件内容：
+
+- web：服务名
+- build：构建相关，后面执行 `docker-compose` 命令路径要和 docker-compose.yml 同一路径，所以这里 context 构建上下文选择上一层源码目录，dockerfile 就是当前目录里的 Dockerfile
+- image：镜像名，如果有就直接使用，没有就通过上面的 Dockerfile 生成
+- ports：端口映射
+- container_name：容器名称，唯一。若不写，则为 `当前目录_服务名_index`，index 数字（从1累加），若这里为 `docker_web_1`
+
+可以把上面用 Dockerfile 生成的容器删了 `docker rm -f react_blog_blog`，用 docker-compose up 生成试试
+
+在 docker 目录下执行命令
+
+```shell
+$ docker-compose up -d
+```
+
+要想重新生成镜像可以 `docker-compose up -d --build`
+
+
+
+以上便把 blog 前端页面部署好了，现在只是单独部署学习，后面会删了和后台与接口一起部署。
+
+
+
+### 2. 部署后台 admin
+
+> 端口映射 9001:9001，服务器端口:容器端口，若是线上服务器，要先在安全组里开通对应的端口号
+
+现在来单独部署 admin，在 Docker 篇时，我们已经使用到 admin 来简单部署学习制作镜像和生成容器，这里依然先在 admin 目录下生成生成环境静态文件
+
+```shell
+$ npm run build
+```
+
+在 admin 下创建 docker 目录用来存放 docker 相关文件，docker 目录下创建以下文件：
+
+***Dockerfile***
+
+```dockerfile
+FROM nginx
+
+# 删除 Nginx 的默认配置
+RUN rm /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+```
+
+注意这里和上面的一些区别，
+
+- 这里把 nginx 默认的配置删除了，之后我们自己配置一个
+- 没有 COPY 静态文件到容器，在 docker-compose.yml 通过挂在的方式实现
+
+
+
+***docker-compose.yml***
+
+```yaml
+version: '3'
+services:
+  admin:
+    build: 
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    image: react_blog:admin
+    ports: 
+      - 9001:80
+    volumes: 
+      - ../build:/www
+      - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
+    container_name: react_blog_admin
+```
+
+这里多了 volumes （卷） 项，参数是数组，对应 宿主机文件:容器内文件
+
+- ../build:/www，build 内的文件挂在到容器 /www 目录下
+- ./nginx.conf:/etc/nginx/conf.d/nginx.conf，nginx.conf 挂载到容器 /etc/nginx/conf.d/nginx.conf 这个文件
+
+这样做的好处是，当宿主机上的文件变动后，容器内的文件也会自动变动，相应的容器内文件变动，宿主机文件也会变动。这样之后源代码变动，重新打包生成 build 后，只需要放到服务器对应目录下，容器类 /www 下的类容就会是最新的，而不需要一次次的去执行 Dockerfile 拷贝 build 文件到容器内，数据库的数据通常也是这样保存在宿主机内，而防止容器删除时丢失数据。
+
+同理 nginx.conf 配置文件也是一样，不过改动 nginx 配置文件后，要重启以下容器才生效 `docker restart container`
+
+
+
+来运行容器吧，在 docker 目录下执行命令
+
+```shell
+$ docker-compose up -d
+```
+
+查看容器是否运行成功
+
+```shell
+$ docker ps -a
+CONTAINER ID   IMAGE          COMMAND             CREATED         STATUS          PORTS            NAMES
+7db8ce1c6814   react_blog:admin   "/docker-entrypoint.…"   16 minutes ago   Up 16 minutes   0.0.0.0:9001->80/tcp   react_blog_admin
+```
+
+运行失败的可以 `docker logs container` 查看日志
+
+运行成功的话，在浏览器通过 `服务器ip:9001` 就可以访问到页面啦，Mac 或者 Windows 本地的话 `localhost:9001` 就可以访问啦。
+
+
+
+***nginx.conf***
+
+```nginx
+server {
+  listen 80;
+  sendfile on;
+  sendfile_max_chunk 1M;
+  tcp_nopush on;
+  gzip_static on;
+
+  location / {
+    root /www;
+    index index.html;
+  }
+}
+```
+
+root 记得和上面挂在目录相同
+
+
+
+### 3. 部署服务接口 service + Mysql
+
+> 端口映射 9002:9002，服务器端口:容器端口，若是线上服务器，要先在安全组里开通对应的端口号
+
+现在我们来部署服务接口，在 service 目录下创建 docker 目录，docker 目录下创建以下文件：
+
+***.dockerignore***
+
+```
+node_modules
+.github
+article
+```
+
+article  目录用来存放博客内容文件
+
+
+
+***Dockerfile***
+
+```dockerfile
+FROM node:alpine
+
+# 配置环境变量
+ENV NODE_ENV production
+
+# 这个是容器中的文件目录
+RUN mkdir -p /usr/src/app 
+
+# 设置工作目录
+WORKDIR /usr/src/app
+
+# 拷贝package.json文件到工作目录
+# !!重要：package.json需要单独添加。
+# Docker在构建镜像的时候，是一层一层构建的，仅当这一层有变化时，重新构建对应的层。
+# 如果package.json和源代码一起添加到镜像，则每次修改源码都需要重新安装npm模块，这样木有必要。
+# 所以，正确的顺序是: 添加package.json；安装npm模块；添加源代码。
+COPY package.json /usr/src/app/package.json
+
+# 安装npm依赖(使用淘宝的镜像源)
+# 如果使用的境外服务器，无需使用淘宝的镜像源，即改为`RUN npm i`。
+RUN npm i --production --registry=https://registry.npm.taobao.org
+
+# 拷贝所有源代码到工作目
+COPY . /usr/src/app
+
+# 暴露容器端口
+EXPOSE 9002
+
+CMD npm start
+```
+
+
+
+***docker-compose.yml***
+
+```yaml
+version: '3'
+services:
+  service:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    image: react_blog:service
+    ports:
+      - 9002:9002
+    depends_on:
+      - db
+    environment:
+      MYSQL_HOST: localhost
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 8023
+    volumes:
+      - ../article:/usr/src/app/article
+    container_name: react_blog_service
+  db:
+    image: mysql
+    # volumes:
+    #    - /db_data:/var/lib/mysql
+    ports:
+      - 33061:3306
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: 8023
+      # MYSQL_USER: root
+      MYSQL_PASSWORD: 8023
+      MYSQL_DATABASE: react_blog
+    container_name: react_blog_mysql
+```
+
+注意这里有运行了两个服务 service、db
+
+**service** 服务是后端接口：
+
+- deponds_on：运行时会先运行 deponds_on 列表里的服务，防止依赖项还没运行，自己会报错
+
+- command：从 MySQL8.0 开始，默认的加密规则使用的是 caching_sha2_password，此命令可以更改加密规则。不加可能会报错 `Client does not support authentication protocol requested by server; consider upgrading MySQL client`
+
+- environment：环境变量，这里会传入代码中，在代码 /config/secret.js(secret-temp.js) 里面可以会使用到
+
+  ```js
+  /**
+   * secret.js 模板
+   */
+  
+  module.exports = {
+    // mysql 连接配置
+    mysql: {
+      host: process.env.MYSQL_HOST || 'localhost',
+      port: process.env.MYSQL_PORT || '3306',
+      user: process.env.MYSQL_USER || 'xxx',
+      password: process.env.MYSQL_PASSWORD || 'xxx',
+      database: process.env.MYSQL_DATABASE || 'xxxxxx',
+    },
+    // jwt
+    tokenConfig: {
+      privateKey: 'xxxxxxxxxxxxxxxxxxxxxxxxx',
+    },
+  }
+  ```
+
+- volumes：这里我把文章写入宿主机了，挂载到容器里
+
+**db** 服务是 Mysql 数据库：
+
+- volumes：数据设置存储在宿主机
+
+- ports：端口映射，宿主机通过 33061 端口可以访问容器内部 Mysql，我们之后就可以通过 Navicat 或其他数据库可视化工具来连接
+- environment：配置数据库
+  - MYSQL_ROOT_PASSWORD 必须要带上，设置 ROOT 账号的密码
+  - MYSQL_USER 容器登录 MySQL 用户名，**注意**，这里如果是 root 会报错 `ERROR 1396 (HY000): Operation CREATE USER failed for 'root'@'%' ` ，根据 https://github.com/docker-library/mysql/issues/129 可知，已经存在一个 root 用户，无法再创建，所以这个可以不带，就默认 root 用户登录，如果带的话就不要是 root，会新建一个账户
+  - MYSQL_PASSWORD 容器登录 Mysql 密码，对用户名 MYSQL_USER，如果是 ROOT，密码就是 MYSQL_ROOT_PASSWORD，如果是其他，就是设置新密码
+  - MYSQL_DATABASE 创建一个 react_blog 数据库，也可以不填，后面再进入容器或者 Navicat 创建，但是这里因为后端代码要连接到 react_blog 数据库，不创建的会连接会保存，所以还是加上。（实在不想加也可以后见创建好数据库后，才运行两个容器）
+
+
+
+在 service/docker 目录下执行命令
+
+```shell
+$ docker-compose up -d
+```
+
+运行成功的话，看看 images 和 container
+
+```shell
+$ docker images
+REPOSITORY   TAG         IMAGE ID       CREATED             SIZE
+react_blog   service     89139d833458   About an hour ago   150MB
+react_blog   admin       1b5d6946f1fe   32 hours ago        133MB
+react_blog   blog        fef06dfed97f   35 hours ago        329MB
+nginx        latest      ae2feff98a0c   2 days ago          133MB
+mysql        latest      ab2f358b8612   6 days ago          545MB
+node         12-alpine   844f8bb6a3f8   3 weeks ago         89.7MB
+```
+
+可以看到多了 Mysql 和 react_blog:blog 镜像
+
+```shell
+$ docker ps -a
+CONTAINER ID   IMAGE             COMMAND       CREATED           STATUS        PORTS                       NAMES
+5878940d7626   react_blog:blog   "docker..."   5 seconds ago     Up 4 seconds  0.0.0.0:9000->9000/tcp      react_blog_blog
+3bff0060de19   react_blog:admin  "/docker…"    3 minutes ago     Up 18 seconds 0.0.0.0:9001->80/tcp        react_blog_admin
+d8a899232e8c   react_blog:service "docker…"    About a           Exited (1) 5 minutes ago                  react_blog_service
+a9da07ff5cae   mysql              "docker…"    About an hr       33060/tcp, 0.0.0.0:33061->3306/tcp        react_blog_mysql
+```
+
+可以看到多了 react_blog_service 和 react_blog_mysql 容器，其中 react_blog_service 容器运行失败了，显示没事失败的先别高兴，咱们来看看日志
+
+```shell
+$ docker logs react_blog_service
+
+...
+errno: "ECONNREFUSED"
+code: "ECONNREFUSED"
+syscall: "connect"
+address: "127.0.0.1"
+port: 3306
+fatal: true
+name: "ECONNREFUSEDError"
+pid: 47
+hostname: d8a899232e8c
+...
+```
+
+可以看出是数据库连接失败了，在上面 **docker-compose.yml** 中我们定义的环境变量 `MYSQL_HOST=localhost` 传给后端代码来连接数据库，每个容器都相当一一个独立的个体，localhost 是 react_blog_service 自己的 ip (127.0.0.1)，当然是访问不到 react_blog_mysql，这个问题我们在下一节再来解决，先来说说 Mysql。
+
+上面可以看到 Mysql 容器已经成功运行，我们可以进入容器内部连接 Mysql，还记得怎么进入容器吗
+
+```shell
+$ docker exec -it react_blog_mysql /bin/sh
+
+$ ls
+bin  boot  dev	docker-entrypoint-initdb.d  entrypoint.sh  etc	home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+$ mysql -uroot -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 12
+Server version: 8.0.22 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2020, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> 
+
+```
+
+可以看到顺利连接 Mysql，输入 `exit` 可以退出容器。我们也可以使用可视化工具来连接，我这里使用 Navicat 来连接
+
+![image-20201218224818914](https://cloud-images-1255423800.cos.ap-guangzhou.myqcloud.com/Docker-03.png)
+
+![image-20201218225257487](https://cloud-images-1255423800.cos.ap-guangzhou.myqcloud.com/Docker-04.png)
+
+
+
+注意这里的端口 33061，上面我们通过端口映射，通过宿主机端口 33061 可以访问到 Mysql 容器内端口 3306，所以就连接上啦。
+
+> 在这个过程中，我的服务器（宿主机）上的 Mysql 出现了问题，连接时报错 `2013 lost connection to mysql server at 'reading initial communication packet'`，我也不知道是什么原因引起的，解决方式是运行命令 `systemctl start mysqld.service` 启动 Mysql 服务，也不知是哪里影响到了，不过后面我会直接连接宿主机 Mysql，不使用容器，这样可以和其他项目统一管理数据，我任务比较方便，且数据也较安全。
+
+
+
+### 4. 容器互联
+
+上面留了一个问题，service 连接数据库失败，现在我们来尝试解决。参考 [Docker 筑梦师系列（一）：实现容器互联](https://tuture.co/2020/01/12/cd44c84/)
+
+#### 4.1 Network 类型
+
+Network，顾名思义就是 “网络”，能够让不同的容器之间相互通信。首先有必要要列举一下 Docker Network 的五种驱动模式（driver）：
+
+- `bridge`：默认的驱动模式，即 “网桥”，通常用于**单机**（更准确地说，是单个 Docker 守护进程）
+- `overlay`：Overlay 网络能够连接多个 Docker 守护进程，通常用于**集群**，后续讲 Docker Swarm 的文章会重点讲解
+- `host`：直接使用主机（也就是运行 Docker 的机器）网络，仅适用于 Docker 17.06+ 的集群服务
+- `macvlan`：Macvlan 网络通过为每个容器分配一个 MAC 地址，使其能够被显示为一台物理设备，适用于希望直连到物理网络的应用程序（例如嵌入式系统、物联网等等）
+- `none`：禁用此容器的所有网络
+
+默认情况下，创建的容器都在 bridge 网络下，如下如所示，各个容器通过 dokcer0 可连接到宿主机HOST，并且各自分配到 IP，这种情况下，容器间互相访问需要输入对方的 IP 地址去连接。
+
+![image-20201220153944034](https://cloud-images-1255423800.cos.ap-guangzhou.myqcloud.com/Docker-05.png)
+
+
+
+查看 network 列表
+
+```shell
+$ docker network ls
+NETWORK ID     NAME             DRIVER    SCOPE
+a75e040b03ed   bridge           bridge    local
+13545e6a3970   docker_default   bridge    local
+5ec462838a1c   host             host      local
+c726e6887f10   none             null      local
+```
+
+这里有 4 的 network，默认本来只有 3 个，没有 docker_default，我也是写到这里才发现创建了一个 docker_default 网络，查找官网（[Networking in Compose](https://docs.docker.com/compose/networking/#:~:text=By%20default%20Compose%20sets%20up,identical%20to%20the%20container%20name.)）才发现，通过 docker-compose 来生成运行容器时，如果没指定 network，会自动创建一个 network，包含当前 docker-compose.yml 下的所有容器，network 名字默认为 **`目录_default`** ，这里目录就是 `docker` 恰好我们这个几个 docker-compose.yml 都是放在 docker 目录下，所以创建的几个容器都是在  docker_default 网络里。可以一下命令查看网络详细信息
+
+```shell
+$ docker network inspect docker_default
+
+[
+    {
+        "Name": "docker_default",
+        "Id": "13545e6a39708344b363b7fc16eefeb6775c37773222804ebd5b5fb6f28c38bb",
+        "Created": "2020-12-16T11:03:37.2152073+08:00",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.24.0.0/16",
+                    "Gateway": "172.24.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": true,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "23891d43187e046eea25936dc0ab703964cc6c7213bb150ae9529da3e2e57662": {
+                "Name": "react_blog_mysql",
+                "EndpointID": "649857f928e0444500cfd296035869678bf26162d429a4499b262776b2a1d264",
+                "MacAddress": "02:42:ac:18:00:03",
+                "IPv4Address": "172.24.0.3/16",
+                "IPv6Address": ""
+            },
+            "3bff0060de19fc973039c07c1931e2c1efe30c6707bcd77d2ff7ea4dc01aaf63": {
+                "Name": "react_blog_admin",
+                "EndpointID": "25d8fa518b0ce27498f562372c3424aee174cb1d8fbf9f2445f1c6af8e6aab7f",
+                "MacAddress": "02:42:ac:18:00:02",
+                "IPv4Address": "172.24.0.2/16",
+                "IPv6Address": ""
+            },
+            "5878940d7626a9fb20622cde4002075e390e5036036bafb99d80454d6cba594b": {
+                "Name": "react_blog_blog",
+                "EndpointID": "a3f8ee36eda09f524be7ea16a67a1e13e62cf558e5480218bb523f877d478e4a",
+                "MacAddress": "02:42:ac:18:00:04",
+                "IPv4Address": "172.24.0.4/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {},
+        "Labels": {
+            "com.docker.compose.network": "default",
+            "com.docker.compose.project": "docker",
+            "com.docker.compose.version": "1.25.1"
+        }
+    }
+]
+```
+
+可以看到 docker_default 网关地址为 `172.24.0.1` ，其他几个容器 IP 分别为 `172.24.0.3`，`172.24.0.2`，`172.24.0.4`，所以这里的情况是这样的
+
+![image-20201220154038077](https://cloud-images-1255423800.cos.ap-guangzhou.myqcloud.com/Docker-06.png)
+
+上面说了默认网络 bridge 下容器见访问只能输入 **IP 地址**来连接，而自定义的网络还可以通过**容器名**来连接
+
+> On user-defined networks like `alpine-net`, containers can not only communicate by IP address, but can also resolve a container name to an IP address. This capability is called **automatic service discovery**. 
+>
+> [Networking with standalone containers](https://docs.docker.com/network/network-tutorial-standalone/)
+
+这就可以避免每次生成容器 IP 会变的问题了。知道了这些，我们在 service 接口里就可已通过 react_blog_mysql 来连接 react_blog_mysql 容器了，service/docker/docker-compose.yml 修改如下：
+
+```yaml
+version: '3'
+services:
+  service:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    image: react_blog:service
+    ports:
+      - 9002:9002
+    restart: on-failure
+    depends_on:
+      - db
+    environment:
+      MYSQL_HOST: react_blog_mysql # 此处 localhost 换为 mysql 容器名，在同一个自定义网络下，变会自动解析为 IP 连接
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 8023
+    volumes:
+      - ./article:/usr/src/app/article
+    container_name: react_blog_service
+  db:
+    image: mysql
+    ports:
+      - 33061:3306
+    restart: on-failure
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: 8023
+      MYSQL_PASSWORD: 8023
+      MYSQL_DATABASE: react_blog
+    container_name: react_blog_mysql
+```
+
+在此运行命令
+
+```shell
+$ docker-compose up -d --build
+```
+
+![image-20201219011335466](https://cloud-images-1255423800.cos.ap-guangzhou.myqcloud.com/Docker-07.png)
+
+可以看到服务容器已正常运行，`docker logs react_blog_service` 查看日志也没有报错，说明已经连接数数据库，在代码你我加了一个 get 测试接口，在浏览器输入 `IP:9002/api/test/get` 或者 `localhost:9002/api/test/get`，会返回一个 json 对象
+
+```js
+{"message":"Hello You Got It"}
+```
+
+**这里我试了 N 久，一直有问题，**
+
+- Mysql 创建失败，environment 我加了一个 MYSQL_USER: root，结果一直报错  `ERROR 1396 (HY000): Operation CREATE USER failed for 'root'@'%' ` ，根据 https://github.com/docker-library/mysql/issues/129 可知，已经存在一个 root 用户，无法再创建，所以这个可以不带，就默认 root 用户登录，如果带的话就不要是 root，会新建一个账户。这里直接去掉 MYSQL_USER，使用 root 登录
+
+- service 创建失败，日志报错没连接上 Mysql，我试试了好久，最后发现重启一下 service `docker start react_blog_service` 就可以了，所以我觉得应该是 Mysql 创建好后，数据口等一些配置还没搞好，所以 service 还连接不上，就一直报错，等一会重新运行 service 就好了，所以这里加上了 restart 参数，报错就重新启动，这样就不用自己去重启了，等一会，看日志没问题，就是连接成功了。
+
+  明明使用了 depends_on，为什么还会有这种问题呢，我也不太清楚，不过官网有这段示例：
+
+  ```yaml
+  version: "3.9"
+  services:
+    web:
+      build: .
+      depends_on:
+        - db
+        - redis
+    redis:
+      image: redis
+    db:
+      image: postgres
+  ```
+
+  > `depends_on` does not wait for `db` and `redis` to be “ready” before starting `web` - only until they have been started. If you need to wait for a service to be ready, see [Controlling startup order](https://docs.docker.com/compose/startup-order/) for more on this problem and strategies for solving it.
+  >
+  > Depends_on 在启动 Web 之前不会等待 db 和 Redis 处于“就绪”状态-仅在它们启动之前。
+  >
+  > 应该就这个原因了~
+
+
+
+我们再来看看 docker_default 网络
+
+```shell
+$ docker network inspect docker_default
+
+[
+    {
+        "Name": "docker_default",
+        "Id": "13545e6a39708344b363b7fc16eefeb6775c37773222804ebd5b5fb6f28c38bb",
+        "Created": "2020-12-16T11:03:37.2152073+08:00",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.24.0.0/16",
+                    "Gateway": "172.24.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": true,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "3bff0060de19fc973039c07c1931e2c1efe30c6707bcd77d2ff7ea4dc01aaf63": {
+                "Name": "react_blog_admin",
+                "EndpointID": "25d8fa518b0ce27498f562372c3424aee174cb1d8fbf9f2445f1c6af8e6aab7f",
+                "MacAddress": "02:42:ac:18:00:02",
+                "IPv4Address": "172.24.0.2/16",
+                "IPv6Address": ""
+            },
+            "5878940d7626a9fb20622cde4002075e390e5036036bafb99d80454d6cba594b": {
+                "Name": "react_blog_blog",
+                "EndpointID": "a3f8ee36eda09f524be7ea16a67a1e13e62cf558e5480218bb523f877d478e4a",
+                "MacAddress": "02:42:ac:18:00:04",
+                "IPv4Address": "172.24.0.4/16",
+                "IPv6Address": ""
+            },
+            "83005eec8d50071a6c23a2be4af8552983c09c532e937f04d79f02f8eb68acc9": {
+                "Name": "react_blog_mysql",
+                "EndpointID": "265ed7793c98287a05ccf8997e81671287a02ee8ea464984996083a34abe10dd",
+                "MacAddress": "02:42:ac:18:00:03",
+                "IPv4Address": "172.24.0.3/16",
+                "IPv6Address": ""
+            },
+            "937339a37ce726e704ec21b31b4028a97967a00de01438557e5a60d8538a51c8": {
+                "Name": "react_blog_service",
+                "EndpointID": "934d26f32a2b23e2cb4691020cb93d26c97b9647108047b492c3f7dd2be6faef",
+                "MacAddress": "02:42:ac:18:00:05",
+                "IPv4Address": "172.24.0.5/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {},
+        "Labels": {
+            "com.docker.compose.network": "default",
+            "com.docker.compose.project": "docker",
+            "com.docker.compose.version": "1.25.1"
+        }
+    }
+]
+```
+
+可以看到 react_blog_service 也已正常加入网络，IP 为 172.24.0.5
+
+
+
+#### 4.2 自定义 Network
+
+docker_default 网络是根据目录来创建的，恰巧我们这几个项目 docker-compose.yml 文件都放在 docker 目录下，所以都在一个网络，如果名称变了就不在一个网络，并且之后项目可能还会有 docker 目录，全部都在一个网络也是不太好的，所以这里我们来自定义本次项目的网络。
+
+***blog/docker/docker-compose.yml***
+
+```yaml
+version: '3'
+services:
+  blog:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    image: react_blog:blog
+    ports:
+      - 9000:9000
+    networks: 
+      - react_blog
+    container_name: react_blog_blog
+networks: 
+  react_blog:
+```
+
+***admin/docker/docker-compose.yml***
+
+```yaml
+version: '3'
+services:
+  admin:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    image: react_blog:admin
+    ports:
+      - 9001:80
+    volumes:
+      - ../build:/www
+      - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
+    networks:
+      - react_blog
+    container_name: react_blog_admin
+networks:
+  react_blog:
+```
+
+***service/docker/docker-compose.yml***
+
+```yaml
+version: '3'
+services:
+  service:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    image: react_blog:service
+    ports:
+      - 9002:9002
+    depends_on:
+      - db
+    environment:
+      - MYSQL_HOST=react_blog_mysql # 此处 localhost 换为 mysql 容器名，在同一个自定义网络下，变会自动解析为 IP 连接
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=8023
+    volumes:
+      - ./article:/usr/src/app/article
+    networks:
+      - react_blog
+    container_name: react_blog_service
+  db:
+    image: mysql
+    ports:
+      - 33061:3306
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_ROOT_PASSWORD=8023
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=8023
+      - MYSQL_DATABASE=react_blog
+    networks:
+      - react_blog
+    container_name: react_blog_mysql
+networks:
+  react_blog:
+```
+
+- 与services 同级的 networks：创建一个新的 network，这里生成的 network 最终名称也会加上目录名，docker_react_blog。
+- 服务内部的 networks：加入哪些网络，参数带 “-” 说明是数组，可以加入多个网络，这里我们全部加入 react_blog，不分前后端了
+
+**注意：**
+
+这样在 dockor-compose.yml 里生成的 network 都会加上当前目录名，若想不带，可以自己先生成一个
+
+```shell
+$ docker network create my_net
+```
+
+然后在 dockor-compose.yml 里
+
+```yaml
+version: '3'
+services:
+  service:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    image: react_blog:service
+    ports:
+      - 9002:9002
+    depends_on:
+      - db
+    environment:
+      - MYSQL_HOST=react_blog_mysql # 此处 localhost 换为 mysql 容器名，在同一个自定义网络下，变会自动解析为 IP 连接
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=8023
+    volumes:
+      - ./article:/usr/src/app/article
+    networks:
+      - my_net
+    container_name: react_blog_service
+  db:
+    image: mysql
+    ports:
+      - 33061:3306
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_ROOT_PASSWORD=8023
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=8023
+      - MYSQL_DATABASE=react_blog
+    networks:
+      - my_net
+    container_name: react_blog_mysql
+networks:
+  my_net:
+  	external: true
+```
+
+加个 external 参数则使用已经创建的 network（my_net），不会再去创建或加上目录名。
+
+
+
+我们再来重新创建容器，先删除全部容器
+
+```shell
+$ docker stop $(docker ps -aq) 
+$ docker rm $(docker ps -aq)
+```
+
+在进入各个目录分别执行 `docker-compose up -d`，在运行第一个时会看到 `Creating network "docker_react_blog" with the default driver` 这句话，说明创建了一个新的 network，我们来看看
+
+```shell
+$ docker network ls
+NETWORK ID     NAME                DRIVER    SCOPE
+a75e040b03ed   bridge              bridge    local
+13545e6a3970   docker_default      bridge    local
+e1ceb437a4fd   docker_react_blog   bridge    local
+5ec462838a1c   host                host      local
+c726e6887f10   none                null      local
+
+$ docker network inspect docker_react_blog
+[
+    {
+        "Name": "docker_react_blog",
+        "Id": "e1ceb437a4fdc5de91e51ff8831e21b565c92754159ad7057de36758e548a92f",
+        "Created": "2020-12-19T01:39:02.201644444+08:00",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.18.0.0/16",
+                    "Gateway": "172.18.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": true,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "00da404f6f050b9b2f20e39bbb136fef614e8dfee85ec31bd6000bfd59cc2dab": {
+                "Name": "react_blog_mysql",
+                "EndpointID": "1cb966cc731eca3e9721e6d3edcfcac6152b66051faa934557f567e9e36c75c6",
+                "MacAddress": "02:42:ac:12:00:04",
+                "IPv4Address": "172.18.0.4/16",
+                "IPv6Address": ""
+            },
+            "ad1480e48e8e7ed160b1d4bcf7eed77d74505aea7581d48d8931206772b5d805": {
+                "Name": "react_blog_service",
+                "EndpointID": "8866c3457382d6baa945da09aef40da54c7dfdea0f393485001c35bb37d201a0",
+                "MacAddress": "02:42:ac:12:00:05",
+                "IPv4Address": "172.18.0.5/16",
+                "IPv6Address": ""
+            },
+            "b518d40b5021d3fdec7b7e62fbaa47b8a705a38346ccba2b9814174e46b67cd0": {
+                "Name": "react_blog_admin",
+                "EndpointID": "9a58ff20dc57d4d1fa6af83482051a68e80e22a5e37cf8e0cb3570b78102f107",
+                "MacAddress": "02:42:ac:12:00:03",
+                "IPv4Address": "172.18.0.3/16",
+                "IPv6Address": ""
+            },
+            "db0050257a8e8a0fa430ea04b009ae819dbf04ef001cf1027ec2b5565403b48e": {
+                "Name": "react_blog_blog",
+                "EndpointID": "664794ed292871bc7fd8e1c4eaa56f682a6be5d653209f84158f3334a4f30660",
+                "MacAddress": "02:42:ac:12:00:02",
+                "IPv4Address": "172.18.0.2/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {},
+        "Labels": {
+            "com.docker.compose.network": "react_blog",
+            "com.docker.compose.project": "docker",
+            "com.docker.compose.version": "1.25.1"
+        }
+    }
+]
+```
+
+
+
+#### 4.3 调用接口
+
+现在还有一个问题，我们在代码中调用接口形式是 `http://localhost:9002/api/xxx` ，在 react_blog_blog 容器中调用接口 localhost 是本身自己，没有调到 react_blog_service 里面的接口。
+
+
+
+**针对 admin**
+
+在代码中，我们这样来调接口
+
+```js
+const API = {
+  getArticleList: '/api/getArticleList',
+  getArticle: '/api/getArticle',
+  addArticle: '/api/addArticle',
+  delArticle: '/api/delArticle',
+
+  getTagList: '/api/getTagList',
+  addTag: '/api/addTag',
+  delTag: '/api/delTag',
+
+  register: '/api/register',
+  login: '/api/login',
+}
+
+export default API
+```
+
+![image-20201219160058561](https://cloud-images-1255423800.cos.ap-guangzhou.myqcloud.com/Docker-08.png)
+
+
+
+会发现接口 404，我们通过 nginx 来代理接口请求
+
+***admin/docker/nginx.conf***
+
+```nginx
+server {
+  listen 80;
+  sendfile on;
+  sendfile_max_chunk 1M;
+  tcp_nopush on;
+  gzip_static on;
+
+  location /api {
+    proxy_pass http://react_blog_service:9002;
+  }
+
+  location / {
+    root /www;
+    index index.html;
+  }
+}
+```
+
+以 /api 为开头的请求，我们都转发到 react_blog_service 容器 9002 端口，将 nginx.conf 拖到服务器，因为我们是将此文件挂载到容器内部的，所以这里只需要重启一下容器
+
+```shell
+$ docker restart react_blog_admin
+```
+
+再看看请求接口，可以看到请求 200 成功，返回数据，如果返回 500，说明数据库还没建表，将目录下 react_blog.sql 导入数据库就可以了。
+
+![image-20201219160458357](https://cloud-images-1255423800.cos.ap-guangzhou.myqcloud.com/Docker-09.png)
+
+
+
+**针对 blog**
+
+开始我以为通过环境变量（Next 中要存储在运行时变量里 [Runtime Configuration](https://nextjs.org/docs/api-reference/next.config.js/runtime-configuration)）来传递请求 HOST (react_blog_service || localhost) ，但发现 react_blog_service 直接拼在前端接口里访问是不可行的（getServerSideProps 可行），所以最后还是改为 nginx 来代理请求，并且后面我们肯定还是要通过域名来访问网站的，所以还是需要 nginx，那么我们就为前台页面来加一个 nginx 容器。
+
+**1、创建环境变量**
+
+***blog/docker/Dockerfile***
+
+```dockerfile
+# node 镜像
+# apline 版本的node会小很多
+FROM node:12-alpine
+
+# 在容器中创建目录
+RUN mkdir -p /usr/src/app
+
+# 指定工作空间，后面的指令都会在当前目录下执行
+WORKDIR /usr/src/app
+
+# 拷贝 package.json
+COPY package.json /usr/src/app
+
+# 安装依赖
+RUN npm i --production --registry=https://registry.npm.taobao.org
+
+# 拷贝其他所有文件到容器（除了 .dockerignore 中的目录和文件）
+COPY . /usr/src/app
+
+# build 阶段获取
+ENV HOST react_blog_service ## 增加一个环境变量，在 build 阶段可获取到，一定放在 npm run build 前一行
+
+# build
+RUN npm run build
+
+# 暴露端口 9000
+EXPOSE 9000
+
+# 运行容器时执行命令，每个 Dokcerfile 只能有一个 CMD 命令，多个的话只有最后一个会执行
+CMD [ "npm", "start" ]
+```
+
+代码中，设置运行是变量 ***blog/next.config.js***
+
+```js
+const withCSS = require('@zeit/next-css')
+const withLess = require('@zeit/next-less')
+module.exports = () =>
+  withLess({
+    ...withCSS(),
+    // 改为 nginx 代理
+    publicRuntimeConfig: {
+      HOST: process.env.HOST || 'localhost', // 如果是 docker build，此处 process.env.HOST，否则就 localhsot，不影响本地运行
+    },
+  })
+```
+
+在 ***blog/config/api***
+
+```js
+import getConfig from 'next/config'
+const { publicRuntimeConfig } = getConfig()
+
+const SSRHOST = `http://${publicRuntimeConfig.HOST}:9002`
+const HOST = `http://localhost:9002`
+
+export const SSRAPI = {
+  getArticleList: SSRHOST + '/api/getArticleList',
+  getArticle: SSRHOST + '/api/getArticle',
+}
+
+export const API = {
+  getArticleList: HOST + '/api/getArticleList',
+  getArticle: HOST + '/api/getArticle',
+}
+```
+
+这里有点麻烦，我不知道我的理解对不对，但试了多种情况只有这种本地和 docker 部署才都可以。
+
+- 如果是本地运行（不使用 docker），服务端获取数据（**getServerSideProps**）和页面中获取数据直接使用服务接口地址（localhost:9002）即可
+
+- 如果是 docker 运行，服务端获取数据（**getServerSideProps**）需要直接带上服务接口容器地址，无法通过 nginx 代理，页面中获取数据调用接口则职能通过 nginx 代理的方式
+
+**2、nginx 代理**
+
+修改 ***blog/docker/docker-compose.yml***，增加一个 nginx 容器
+
+```yaml
+version: '3'
+services:
+  blog:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    image: react_blog:blog
+    # ports:
+    #   - 9000:9000
+    networks:
+      - react_blog
+    container_name: react_blog_blog
+  nginx:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile-nginx
+    image: react_blog:nginx
+    ports:
+      - 9000:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
+    networks:
+      - react_blog
+    container_name: react_blog_nginx
+networks:
+  react_blog:
+```
+
+***blog/docker/Dockerfile-nginx***
+
+```dockerfile
+FROM nginx
+
+# 删除 Nginx 的默认配置
+RUN rm /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+```
+
+***blog/docker/nginx.conf***
+
+```nginx
+server {
+  listen 80;
+  sendfile on;
+  sendfile_max_chunk 1M;
+  tcp_nopush on;
+  gzip_static on;
+
+  location /api {
+    proxy_pass http://react_blog_service:9002;
+  }
+
+  location / {
+    proxy_pass http://react_blog_blog:9000;
+  }
+}
+```
+
+**3、生成容器**
+
+因为 blog 的内容有变，所以需要重新生成镜像，使用 `docker-compose up -d --build` 会重新下载 npm node_modules，比较慢，所以还是先生成镜像。
+
+在 blog 目录下执行
+
+```shell
+$ docker build -f docker/Dockerfile . -t react_blog:blog
+```
+
+在 blog/docker 下执行
+
+```shell
+$ docker-compose up -d
+```
+
+运行成功的话，再试试接口就可以获取数据啦。
+
+
+
+### 5. 连接宿主机 Mysql
+
+上面遇到一个问题，在上面过程中，我的服务器（宿主机）上的 Mysql 出现了问题，连接时报错 `2013 lost connection to mysql server at 'reading initial communication packet'`，我也不知道是什么原因引起的，解决方式是运行命令 `systemctl start mysqld.service` 启动 Mysql 服务，也不知是哪理影响到了。因为之前其他项目都是单独部署的，没使用 docker，数据都在宿主机 Mysql 上，所以我还是跟倾向于统一管理，自适应宿主机一个 Mysql，下面来看看怎么实现吧。
+
+这里有两种方式
+
+**方式一：network_mode: host**
+
+修改 ***service/docker/docker-compose.yml***
+
+```yaml
+version: '3'
+services:
+  service:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    image: react_blog:service
+    ports:
+      - 9002:9002
+    restart: on-failure
+    # depends_on:
+    #   - db
+    environment:
+      # MYSQL_HOST: react_blog_mysql # 此处 localhost 换为 mysql 容器名，在同一个自定义网络下，变会自动解析为 IP 连接
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 8023
+    volumes:
+      - ../article:/usr/src/app/article
+    network_mode: host
+    # networks:
+    #   - react_blog
+    container_name: react_blog_service
+  # db:
+  #   image: mysql
+  #   ports:
+  #     - 33061:3306
+  #   restart: on-failure
+  #   command: --default-authentication-plugin=mysql_native_password
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: 8023
+  #     MYSQL_PASSWORD: 8023
+  #     MYSQL_DATABASE: react_blog
+  #   networks:
+  #     - react_blog
+  #   container_name: react_blog_mysql
+networks:
+  react_blog:
+```
+
+service/docker 下执行命令
+
+```shell
+$ docker-compose up -d
+
+$ docker ps -a
+CONTAINER ID   IMAGE                COMMAND                  CREATED          STATUS          PORTS    NAMES
+af9e525e7d14   react_blog:service   "docker-entrypoint.s…"   28 seconds ago   Up 26 seconds            react_blog_service
+```
+
+可以看到 service 运行正常，且没有端口映射，`docker inspect react_blog_service` 也没有分配 IP，这种就相当于一个 Node 应用自己连接到宿主机 Mysql。但是对于页面接口请求来说，因为 react_blog_service 已不在 docker_react_blog ，所以就要使用宿主机 IP 地址来访问了。
+
+***nginx.conf***
+
+```nginx
+server {
+  listen 80;
+  sendfile on;
+  sendfile_max_chunk 1M;
+  tcp_nopush on;
+  gzip_static on;
+
+  location /api {
+    # proxy_pass http://react_blog_service:9002;
+    proxy_pass http://xxx.xx.xxx.x:9002; # xxx.xx.xxx.x 为宿主机(服务器)IP 
+  }
+
+  location / {
+    proxy_pass http://react_blog_blog:9000;
+  }
+}
+```
+
+服务端渲染接口也是一样
+
+```dockerfile
+# node 镜像
+# apline 版本的node会小很多
+FROM node:12-alpine
+
+# 在容器中创建目录
+RUN mkdir -p /usr/src/app
+
+# 指定工作空间，后面的指令都会在当前目录下执行
+WORKDIR /usr/src/app
+
+# 拷贝 package.json
+COPY package.json /usr/src/app
+
+# 安装依赖
+RUN npm i --production --registry=https://registry.npm.taobao.org
+
+# 拷贝其他所有文件到容器（除了 .dockerignore 中的目录和文件）
+COPY . /usr/src/app
+
+# build 阶段获取，xxx.xx.xxx.x 为宿主机(服务器)IP
+ENV HOST xxx.xx.xxx.x
+
+# build
+RUN npm run build
+
+# 暴露端口 9000
+EXPOSE 9000
+
+# 运行容器时执行命令，每个 Dokcerfile 只能有一个 CMD 命令，多个的话只有最后一个会执行
+CMD [ "npm", "start" ]
+```
+
+这种方式是不是很麻烦，还要暴露服务器 IP 地址，所以我选择方式二
+
+
+
+**方式二：**
+
+修改 ***service/docker/docker-compose.yml***
+
+```yaml
+version: '3'
+services:
+  service:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    image: react_blog:service
+    ports:
+      - 9002:9002
+    restart: on-failure
+    # depends_on:
+    #   - db
+    environment:
+      MYSQL_HOST: 172.17.0.1
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 8023
+    volumes:
+      - ../article:/usr/src/app/article
+    networks:
+      - react_blog
+    container_name: react_blog_service
+  # db:
+  #   image: mysql
+  #   ports:
+  #     - 33061:3306
+  #   restart: on-failure
+  #   command: --default-authentication-plugin=mysql_native_password
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: 8023
+  #     MYSQL_PASSWORD: 8023
+  #     MYSQL_DATABASE: react_blog
+  #   networks:
+  #     - react_blog
+  #   container_name: react_blog_mysql
+networks:
+  react_blog:
+```
+
+这里 MYSQL_HOST 为 172.17.0.1，上面也说了，容器可以通过此 IP 来连接到宿主机，所以这就连接上宿主机的 Mysql 了，其他的地方就不需要改了。
+
+
+
+### 6. 一个 docker-compoer.yml
+
+前面用了 3 个 docker-compose.yml 来启动各自的项目，还是挺繁琐的，我们来写一个汇总的，一个命令运行所以，当然后面某一个项目需要重新跑，也可以进入各自目录去运行自己的 docker-compose.yml
+
+在项目根目录创建 ***docker/docker-compose.yml***，创建 docker 目录，是为了创建的 network 和单个项目运行是创建的一致
+
+```yaml
+version: '3'
+services:
+  blog:
+    build:
+      context: ../blog
+      dockerfile: ./docker/Dockerfile
+    image: react_blog:blog
+    networks:
+      - react_blog
+    container_name: react_blog_blog
+  nginx:
+    build:
+      context: ../blog
+      dockerfile: ./docker/Dockerfile-nginx
+    image: react_blog:nginx
+    ports:
+      - 9000:80
+    volumes:
+      - ../blog/docker/nginx.conf:/etc/nginx/conf.d/nginx.conf
+    networks:
+      - react_blog
+    container_name: react_blog_nginx
+  admin:
+    build:
+      context: ../admin
+      dockerfile: ./docker/Dockerfile
+    image: react_blog:admin
+    ports:
+      - 9001:80
+    volumes:
+      - ../admin/build:/www
+      - ../admin/docker/nginx.conf:/etc/nginx/conf.d/nginx.conf
+    networks:
+      - react_blog
+    container_name: react_blog_admin
+  service:
+    build:
+      context: ../service
+      dockerfile: ./docker/Dockerfile
+    image: react_blog:service
+    ports:
+      - 9002:9002
+    restart: on-failure
+    environment:
+      MYSQL_HOST: 172.17.0.1
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 8023
+    volumes:
+      - ../service/article:/usr/src/app/article
+    networks:
+      - react_blog
+    container_name: react_blog_service
+networks:
+  react_blog:
+```
+
+停止并删除之前创建的所有容器
+
+```shell
+$ docker stop $(docker ps -aq)
+$ docker rm $(docker ps -aq)
+```
+
+进入 /docker 目录执行，
+
+```shell
+$ docker-compose up -d
+Building nginx
+Step 1/3 : FROM nginx
+ ---> ae2feff98a0c
+Step 2/3 : RUN rm /etc/nginx/conf.d/default.conf
+ ---> Running in bb163c42c6b5
+Removing intermediate container bb163c42c6b5
+ ---> 282cb303dddf
+Step 3/3 : EXPOSE 80
+ ---> Running in 9b77ebd39952
+Removing intermediate container 9b77ebd39952
+ ---> fbb18dda70af
+Successfully built fbb18dda70af
+Successfully tagged react_blog:nginx
+WARNING: Image for service nginx was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
+Building admin
+Step 1/3 : FROM nginx
+ ---> ae2feff98a0c
+Step 2/3 : RUN rm /etc/nginx/conf.d/default.conf
+ ---> Using cache
+ ---> 282cb303dddf
+Step 3/3 : EXPOSE 80
+ ---> Using cache
+ ---> fbb18dda70af
+Successfully built fbb18dda70af
+Successfully tagged react_blog:admin
+WARNING: Image for service admin was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
+Creating react_blog_admin   ... done
+Creating react_blog_service ... done
+Creating react_blog_blog    ... done
+Creating react_blog_nginx   ... done
+
+$ docker ps -a
+CONTAINER ID   IMAGE      			COMMAND    CREATED          STATUS         PORTS                    NAMES
+1fbb15abdd30   react_blog:service   "docker"   13 seconds ago   Up 6 seconds   0.0.0.0:9002->9002/tcp   react_blog_service
+fbee53e25c3a   react_blog:admin     "/docker"  13 seconds ago   Up 6 seconds   0.0.0.0:9001->80/tcp     react_blog_admin
+70cb25f87d14   react_blog:blog      "docker"   13 seconds ago   Up 6 seconds   9000/tcp                 react_blog_blog
+aa9fbf2afea4   react_blog:nginx     "/docker"  13 seconds ago   Up 6 seconds   0.0.0.0:9000->80/tcp     react_blog_nginx
+```
+
+运行成功~
+
+
+
+## 结语
+
+终于写完了，写之前已经学习尝试了好久，以为很有把握了，结果在写的过程中又遇到一堆问题，一个问题可能都会卡好久天，各种百度，Google，油管都用上啦，总算解决了遇到的所有问题，当然这些问题可能只满足了我现在的部署需求，其中还有很多知识点，没有接触到，不过没关系，我就是想成功部署前端项目就可以了。
+
+以上便是 docker 部署前端项目的所有笔记，内容比较啰嗦，希望能帮助后来的同学少走一点坑，因为有些是自己的理解，可能会有错误，还请大家指正，互相学习，over。

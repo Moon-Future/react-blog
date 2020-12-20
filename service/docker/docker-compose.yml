@@ -1,17 +1,21 @@
 version: '3'
 services:
   service:
-    build: 
-      - context: ../
-      - dockerfile: ./docker/Dockerfile
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
     image: react_blog:service
     ports:
       - 9002:9002
+    restart: on-failure
     environment:
-      - MYSQL_HOST=localhost
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=8023
-      # - MYSQL_DATABASE=react_blog
-    network_mode: host
+      MYSQL_HOST: 172.17.0.1
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 8023
+    volumes:
+      - ../article:/usr/src/app/article
+    networks:
+      - react_blog
     container_name: react_blog_service
-  
+networks:
+  react_blog:

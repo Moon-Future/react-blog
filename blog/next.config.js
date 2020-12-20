@@ -1,5 +1,10 @@
 const withCSS = require('@zeit/next-css')
-// const withSass = require('@zeit/next-sass')
 const withLess = require('@zeit/next-less')
-// module.exports = withCSS({})
-module.exports = () => withLess(withCSS())
+module.exports = () =>
+  withLess({
+    ...withCSS(),
+    // 改为 nginx 代理
+    publicRuntimeConfig: {
+      HOST: process.env.HOST || 'localhost',
+    },
+  })

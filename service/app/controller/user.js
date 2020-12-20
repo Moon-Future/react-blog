@@ -18,7 +18,7 @@ class UserController extends Controller {
       username,
       password,
       nickname,
-      create_time: Date.now()
+      create_time: Date.now(),
     })
     if (result.affectedRows === 1) {
       this.ctx.body = { message: '注册成功' }
@@ -45,10 +45,24 @@ class UserController extends Controller {
     const userInfo = {
       id: result.id,
       username: result.username,
-      nickname: result.nickname
+      nickname: result.nickname,
     }
-    const token = jwt.sign(userInfo, tokenConfig.privateKey, {expiresIn: '7d'})
+    const token = jwt.sign(userInfo, tokenConfig.privateKey, { expiresIn: '7d' })
     this.ctx.body = { token: 'Bearer ' + token }
+  }
+
+  async checkAuth() {
+    const token = this.ctx.header.authorization
+    if (!token) {
+      this.ctx.body = { status: 0 }
+      return
+    }
+    try {
+      const userInfo = jwt.verify(token.split(' ')[1], tokenConfig.privateKey)
+      this.ctx.body = { userInfo: userInfo }
+    } catch (e) {
+      this.ctx.body = { status: 0 }
+    }
   }
 }
 

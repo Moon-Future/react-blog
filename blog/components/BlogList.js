@@ -2,11 +2,30 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { List, Breadcrumb, Image, Tag } from 'antd'
 import '../static/style/components/blogList.less'
-import { CalendarTwoTone, EyeTwoTone } from '@ant-design/icons'
+import { CalendarTwoTone, EyeTwoTone, TagTwoTone } from '@ant-design/icons'
 import { formatTime } from '../util/index'
+import marked from 'marked'
+import hljs from 'highlight.js'
 
 const BlogList = (props) => {
   const [articleList] = useState(props.articleList)
+
+  const renderer = new marked.Renderer()
+  marked.setOptions({
+    renderer: renderer,
+    gfm: true,
+    pedantic: false,
+    sanitize: false,
+    tables: true,
+    breaks: false,
+    smartLists: true,
+    smartypants: false,
+    sanitize: false,
+    xhtml: false,
+    highlight: function (code) {
+      return hljs.highlightAuto(code).value
+    },
+  })
 
   return (
     <>
@@ -37,6 +56,7 @@ const BlogList = (props) => {
                 {item.view} 人
               </span>
               <span>
+                <TagTwoTone />
                 {item.tag.map((ele) => (
                   <Tag key={ele.name} color={ele.background} style={{ color: ele.color }}>
                     {ele.name}
@@ -52,7 +72,7 @@ const BlogList = (props) => {
                 </div>
               </div>
             </Link>
-            <div className="list-summary">{item.summary}</div>
+            <div className="markdown-content list-summary" dangerouslySetInnerHTML={{ __html: marked(item.summary) }}></div>
           </List.Item>
         )}
       />

@@ -6,15 +6,15 @@ module.exports = (options) => {
     const token = ctx.header.authorization
     if (!token) {
       ctx.status = 401
-      ctx.body={ message: '请先登录'}
+      ctx.body = { message: '请先登录' }
       return
     }
     try {
-      jwt.verify(token.split(' ')[1], tokenConfig.privateKey)
+      this.ctx.userInfo = jwt.verify(token.split(' ')[1], tokenConfig.privateKey)
       await next()
     } catch (e) {
       ctx.status = 403
-      ctx.body={ message: '请先登录'}
+      ctx.body = { message: '请先登录' }
     }
   }
 }

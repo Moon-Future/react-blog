@@ -1,16 +1,18 @@
-import { Route, Switch } from 'react-router-dom'
-import Home from '../home'
-import Login from '../login'
+import { Route, Switch, Redirect } from 'react-router-dom'
+import routes from '../../router'
 
-function App(props) {
+export default function App(props) {
+  const render = (item, props) => {
+    return <item.component {...props} children={item.children || []} />
+  }
+
   return (
     <div className="app">
       <Switch>
-        <Route path="/login" component={Login} />
-        <Route path="/" component={Home} />
+        {routes.map((item, index) => {
+          return <Route key={index} path={item.path} render={(props) => render(item, props)} />
+        })}
       </Switch>
     </div>
   )
 }
-
-export default App

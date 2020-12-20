@@ -15,7 +15,7 @@ export default function Catalog(props) {
 
       if (item.level > lastItem.level) {
         // item 是 lastItem 的 children
-        for (let i = lastItem.level + 1; i <= 3; i++) {
+        for (let i = lastItem.level + 1; i <= 4; i++) {
           const { children } = lastItem
           if (!children) {
             // 如果 children 不存在

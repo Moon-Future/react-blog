@@ -15,8 +15,9 @@ module.exports = (app) => {
   router.post('/api/addTag', adminAuth, controller.tag.addTag)
   router.post('/api/delTag', adminAuth, controller.tag.delTag)
 
-  router.post('/api/register', controller.user.register)
+  // router.post('/api/register', controller.user.register)
   router.post('/api/login', controller.user.login)
+  router.post('/api/checkAuth', controller.user.checkAuth)
 
   router.get('/api/test/get', controller.test.get)
 }
