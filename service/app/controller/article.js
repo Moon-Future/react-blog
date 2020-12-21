@@ -12,10 +12,7 @@ if (!fs.existsSync(filePath)) {
 class ArticleController extends Controller {
   // 获取文章列表
   async getArticleList() {
-    const result = await this.app.mysql.select('article', {
-      where: { off: 0 },
-      orders: [['add_time', 'DESC']],
-    })
+    const result = await this.app.mysql.query('SELECT a.*, b.username, b.nickname FROM article as a, user as b WHERE a.off != 1 AND a.user_id = b.id ORDER BY a.add_time DESC')
     const tagAll = await this.app.mysql.select('tag')
     result.forEach((item) => {
       const tagSplit = item.tag.split(',')
@@ -33,14 +30,16 @@ class ArticleController extends Controller {
   async getArticle() {
     // allTag 是否获取全部标签，新增文章时需要全部和已选
     const { id, allTag } = this.ctx.request.body
-    const result = await this.app.mysql.get('article', { id: id })
+    const result = (await this.app.mysql.query('SELECT a.*, b.username, b.nickname FROM article as a, user as b WHERE a.id = ? AND a.user_id = b.id', [id]))[0]
     if (result) {
-      await this.app.mysql.update('article', { id: id, view: result.view + 1 })
+      // 新增阅读量
+      allTag ? null : await this.app.mysql.update('article', { id: id, view: result.view + 1 })
       const tagSplit = result.tag.split(',')
       const tag = []
       const tagAll = await this.app.mysql.select('tag', {
         where: { off: 0 },
       })
+      // 更新文章，从所有标签中赛选已选标签
       tagAll.forEach((ele) => {
         const obj = { id: ele.id, name: ele.name, color: ele.color, background: ele.background }
         if (tagSplit.includes(ele.id + '')) {
@@ -63,20 +62,27 @@ class ArticleController extends Controller {
 
   // 新增、更新文章
   async addArticle() {
-    const { id, title, content, summary, coverSrc, tags, flag, addTime, updTime } = this.ctx.request.body
+    const { id, title, content, summary, coverSrc, tags, flag, addTime, updTime, userId } = this.ctx.request.body
+    const userInfo = this.ctx.userInfo
     const data = {
       title,
       summary,
       cover: coverSrc,
       tag: tags.join(','),
       add_time: addTime || Date.now(),
-      state: flag ? 1 : 0,
+      state: userInfo.root ? (flag ? 1 : 0) : 0,
     }
     if (id) {
       // 更新
       data.id = id
       data.upd_time = updTime
       const result = await this.app.mysql.get('article', { id })
+      // 非管理员不能更新他人文章
+      if (userInfo.id !== result.user_id && !userInfo.root) {
+        this.ctx.status = 403
+        this.ctx.body = { message: '没有权限' }
+        return
+      }
       const res = await this.app.mysql.update('article', data)
       const insertSuccess = res.affectedRows === 1
       if (insertSuccess) {
@@ -92,7 +98,7 @@ class ArticleController extends Controller {
     } else {
       // 新增
       data.id = shortid.generate()
-      data.user_id = shortid.generate()
+      data.user_id = userId
       data.view = 0
       const result = await this.app.mysql.get('article', { title })
       if (result) {
@@ -117,6 +123,13 @@ class ArticleController extends Controller {
 
   async delArticle() {
     const { id } = this.ctx.request.body
+    const userInfo = this.ctx.userInfo
+    const article = await this.app.mysql.get('article', { id: id }) 
+    if (userInfo.id != article.user_id && !userInfo.root) {
+      this.ctx.status = 403
+      this.ctx.body = { message: '没有权限' }
+      return
+    }
     const request = await this.app.mysql.update('article', { id, off: 1 })
     if (request.affectedRows === 1) {
       this.ctx.body = { message: '成功' }

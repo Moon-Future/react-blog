@@ -19,11 +19,9 @@ const errorHandle = (status, msg) => {
         window.location.href = '/login'
       }, 1500);
       break
-    // 403 token 过期
-    // 清除 token 并跳转登录页
+    // 403 没有权限
     case 403:
-      message.error('登录过期，请重新登录', 1)
-      localStorage.removeItem('token')
+      message.error(msg, 1)
       break
     // 404 请求不存在
     case 404:

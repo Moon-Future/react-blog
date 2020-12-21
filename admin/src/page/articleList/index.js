@@ -7,6 +7,7 @@ import { formatTime } from '../../util/index'
 class ArticleList extends Component {
   constructor(props) {
     super(props)
+    this.userInfo = props.userInfo
     this.state = {
       articleList: [],
     }
@@ -14,6 +15,7 @@ class ArticleList extends Component {
       {
         title: '标题',
         dataIndex: 'title',
+        width: 250
       },
       {
         title: '标签',
@@ -42,7 +44,7 @@ class ArticleList extends Component {
       },
       {
         title: '用户',
-        dataIndex: 'user_id',
+        dataIndex: 'nickname',
       },
       {
         title: '状态',
@@ -58,14 +60,19 @@ class ArticleList extends Component {
       {
         title: '操作',
         key: 'action',
-        render: (text, record) => (
-          <Space size="middle">
-            <Link to={`/addArticle?id=${record.id}`}>更新</Link>
-            <Button type="link" danger onClick={() => this.delArticle(record)}>
-              删除
-            </Button>
-          </Space>
-        ),
+        render: (text, record) => {
+          if (record.user_id === this.userInfo.id || this.userInfo.root) {
+            return (
+              <Space size="middle">
+                <Link to={`/addArticle?id=${record.id}`}>更新</Link>
+                <Button type="link" danger onClick={() => this.delArticle(record)}>
+                  删除
+                </Button>
+              </Space>
+            )
+          }
+          return null
+        },
       },
     ]
   }

@@ -10,7 +10,7 @@ module.exports = (options) => {
       return
     }
     try {
-      this.ctx.userInfo = jwt.verify(token.split(' ')[1], tokenConfig.privateKey)
+      ctx.userInfo = jwt.verify(token.split(' ')[1], tokenConfig.privateKey)
       await next()
     } catch (e) {
       ctx.status = 403

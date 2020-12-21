@@ -46,9 +46,10 @@ class UserController extends Controller {
       id: result.id,
       username: result.username,
       nickname: result.nickname,
+      root: result.root
     }
     const token = jwt.sign(userInfo, tokenConfig.privateKey, { expiresIn: '7d' })
-    this.ctx.body = { token: 'Bearer ' + token }
+    this.ctx.body = { token: 'Bearer ' + token, userInfo }
   }
 
   async checkAuth() {

@@ -15,6 +15,7 @@ class AddArticle extends Component {
   constructor(props) {
     super(props)
     this.articleId = getUrlParam(props.location.search, 'id')
+    this.userInfo = props.userInfo
     this.state = {
       title: '',
       content: '',
@@ -154,6 +155,7 @@ class AddArticle extends Component {
         updTime: updTime && updTime.valueOf(),
         flag,
         id: this.articleId,
+        userId: this.userInfo.id
       })
       if (this.articleId) {
         this.props.history.goBack()
@@ -180,6 +182,7 @@ class AddArticle extends Component {
 
   render() {
     const { title, content, html, coverSrc, defaultSrc, tags, summary, loading, addTime, updTime } = this.state
+    const userInfo = this.userInfo
     return (
       <>
         <Breadcrumb className="bread-crumb">
@@ -207,9 +210,11 @@ class AddArticle extends Component {
                 <Button style={{ marginRight: '20px', flex: 1 }} loading={loading} onClick={() => this.submit(false)}>
                   暂存
                 </Button>
-                <Button type="primary" style={{ flex: 1 }} loading={loading} onClick={() => this.submit(true)}>
-                  发布
-                </Button>
+                {userInfo.root && (
+                  <Button type="primary" style={{ flex: 1 }} loading={loading} onClick={() => this.submit(true)}>
+                    发布
+                  </Button>
+                )}
               </div>
               <Input.TextArea className="marginb" placeholder="文章概要" value={summary} onChange={(e) => this.inputValue(e, 'summary')} />
               <Input.TextArea className="marginb" placeholder="文章封面地址" value={coverSrc} onChange={(e) => this.inputValue(e, 'coverSrc')} />

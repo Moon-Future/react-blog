@@ -24,6 +24,7 @@ export default function Login(props) {
       data = { username, password: word }
       ajax.post('login', data).then((res) => {
         localStorage.setItem('token', res.data.token)
+        localStorage.setItem('userInfo', JSON.stringify(res.data.userInfo))
         props.history.push('/')
       })
     } else {
@@ -67,7 +68,7 @@ export default function Login(props) {
             <Button type="primary" htmlType="submit" className="login-form-button">
               Log in
             </Button>
-            {/* Or <a href="/login" onClick={e => changePage(e)}>register now!</a> */}
+            Or <a href="/login" onClick={e => changePage(e)}>register now!</a>
           </Form.Item>
         ) : (
           <>

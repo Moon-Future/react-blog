@@ -13,6 +13,11 @@ class TagController extends Controller {
   }
 
   async addTag() {
+    if (!this.ctx.userInfo.root) {
+      this.ctx.status = 403
+      this.ctx.body = { message: '没有权限' }
+      return
+    }
     const { id, name, color, background } = this.ctx.request.body
     const count = await this.app.mysql.count('tag')
     let request
@@ -35,6 +40,11 @@ class TagController extends Controller {
   }
 
   async delTag() {
+    if (!this.ctx.userInfo.root) {
+      this.ctx.status = 403
+      this.ctx.body = { message: '没有权限' }
+      return
+    }
     const { id, off } = this.ctx.request.body
     const request = await this.app.mysql.update('tag', { id, off })
     if (request.affectedRows === 1) {
