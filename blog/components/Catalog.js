@@ -59,7 +59,7 @@ export default function Catalog(props) {
   }
 
   return (
-    <Anchor targetOffset={90} onClick={click}>
+    <Anchor onClick={click}>
       {render(items)}
     </Anchor>
   )

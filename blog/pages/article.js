@@ -52,7 +52,7 @@ const Article = (props) => {
       <Header route={route} />
 
       <div className="page-background"></div>
-      <div style={{ height: '500px' }}></div>
+      <div className="mobile-style" style={{ height: '500px' }}></div>
 
       <Row className="comm-main comm-main-index" type="flex" justify="center">
         <Col className="comm-left" xs={0} sm={0} md={0} lg={5} xl={4} xxl={3}>

@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Row, Col, Tag, Affix } from 'antd'
-import { CalendarTwoTone, EyeTwoTone } from '@ant-design/icons'
+import { CalendarTwoTone, EyeTwoTone, DoubleRightOutlined, DoubleLeftOutlined } from '@ant-design/icons'
 import { motion } from 'framer-motion'
 import Head from 'next/head'
 import Header from '../components/Header'
@@ -17,7 +17,7 @@ import { formatTime } from '../util/index'
 import axios from 'axios'
 import { SSRAPI } from '../config/api'
 
-const postVariants = {
+let postVariants = {
   initial: { x: 1000, opacity: 0 },
   enter: { x: 0, opacity: 1, transition: { duration: 0.5, ease: [0.48, 0.15, 0.25, 0.96] } },
   exit: {
@@ -27,18 +27,20 @@ const postVariants = {
   },
 }
 
-const titleVariants = {
+let titleVariants = {
   initial: { x: 500, opacity: 0 },
   enter: { x: 0, opacity: 1, transition: { duration: 1, ease: [0.48, 0.15, 0.25, 0.96] } },
 }
 
-const infoVariants = {
+let infoVariants = {
   initial: { y: 50, opacity: 0 },
   enter: { y: 0, opacity: 1, transition: { duration: 1, ease: [0.48, 0.15, 0.25, 0.96] } },
 }
 
 const Detailed = (props) => {
   const { articleDetail, route } = props
+  const [width, setWidth] = useState(1200)
+  const [visible, setVisible] = useState(false)
   const renderer = new marked.Renderer()
   const catalogData = []
   let index = 0
@@ -69,6 +71,23 @@ const Detailed = (props) => {
     },
   })
   const html = marked(articleDetail.mdContent)
+
+  useEffect(() => {
+    setWidth(document.documentElement.clientWidth)
+    if (document.documentElement.clientWidth < 500) {
+      postVariants = {}
+      titleVariants = {}
+      infoVariants = {}
+    }
+  }, [])
+
+  const openCatalog = () => {
+    setVisible(true)
+  }
+
+  const closeCatalog = () => {
+    setVisible(false)
+  }
 
   return (
     <div className="container detailed-container">
@@ -106,20 +125,22 @@ const Detailed = (props) => {
         </Row>
       </div>
 
-      <Row className="comm-main" type="flex" justify="center">
+      <Row className="comm-main" type="flex" justify="center" onClick={closeCatalog}>
         <Col className="comm-left" xs={0} sm={0} md={0} lg={5} xl={4} xxl={3}>
-          <Affix offsetTop={90}>
-            {catalogData.length ? (
-              <div className="comm-box">
-                <Catalog catalogData={catalogData} />
-              </div>
-            ) : (
-              <>
-                <Author />
-                <Project />
-              </>
-            )}
-          </Affix>
+          {width >= 992 && (
+            <Affix offsetTop={90}>
+              {catalogData.length ? (
+                <div className="comm-box">
+                  <Catalog catalogData={catalogData} />
+                </div>
+              ) : (
+                <>
+                  <Author />
+                  <Project />
+                </>
+              )}
+            </Affix>
+          )}
         </Col>
 
         <Col className="comm-center" xs={24} sm={24} md={24} lg={16} xl={16} xxl={16}>
@@ -130,6 +151,16 @@ const Detailed = (props) => {
         </Col>
         <Footer />
       </Row>
+
+      {width < 992 && visible && (
+        <div className="mobile-catalog">
+          <Catalog catalogData={catalogData} />
+        </div>
+      )}
+      {width < 992 && (
+        visible ? <DoubleLeftOutlined className="close-catalog-icon" onClick={closeCatalog} /> : <DoubleRightOutlined className="open-catalog-icon" onClick={openCatalog} />
+      )}
+
       <ScrollTop />
     </div>
   )

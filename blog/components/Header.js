@@ -7,14 +7,15 @@ const Header = (props) => {
   const { route } = props
   // const selectedKey = route === '/article' || route === '/detailed' ? '/article' : route
   const selectedKey = route
+
   return (
     <div className="header">
       <div className="header-bg"></div>
-      <Row type="flex" justify="center" className="header-row">
-        <Col className="header-left" xs={22} sm={10} md={10} lg={10} xl={10}>
-          {/* <span className="header-txt">ChenLiang</span> */}
+      <Row type="flex" justify="space-between" className="header-row">
+        <Col className="header-left" xs={0} sm={10} md={10} lg={10} xl={10}>
+          {/* <span className="header-txt">2</span> */}
         </Col>
-        <Col xs={0} sm={12} md={12} lg={8} xl={6}>
+        <Col xs={12} sm={12} md={12} lg={8} xl={6}>
           <Menu mode="horizontal" selectedKeys={[selectedKey]}>
             <Menu.Item key="/">
               <Link href="/">首页</Link>

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import Head from 'next/head'
+import Link from 'next/link'
 import Header from '../components/Header'
 import PoetrySentence from '../components/PoetrySentence'
 import ScrollTop from '../components/ScrollTop'
@@ -31,6 +32,9 @@ const Home = (props) => {
         <motion.div initial="initial" animate="enter" exit="exit" variants={sentenceVariants}>
           <PoetrySentence />
         </motion.div>
+        <div class="mobile-link">
+          <Link href="/article">Blog</Link>
+        </div>
       </div>
 
       <ScrollTop />

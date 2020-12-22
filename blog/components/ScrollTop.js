@@ -33,7 +33,7 @@ export default function ScrollTop() {
     <>
       <span id={id} className="scroll-top-target"></span>
       {show ? (
-        <Anchor onClick={click}>
+        <Anchor onClick={click} className="scroll-top-anchor">
           <Link className="scroll-top-icon" href={`#${id}`} title={<RocketTwoTone />}></Link>
         </Anchor>
       ) : null}

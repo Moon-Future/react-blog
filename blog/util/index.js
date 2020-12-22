@@ -63,7 +63,11 @@ export const getPoetry = {
     return this.sendRequest(newCallBack, errHandler, 'https://v2.jinrishici.com/one.json?client=browser-sdk/1.2')
   },
   commonLoad(callback, errHandler, token) {
-    return this.sendRequest(callback, errHandler, 'https://v2.jinrishici.com/one.json?client=browser-sdk/1.2&X-User-Token=' + encodeURIComponent(token))
+    return this.sendRequest(
+      callback,
+      errHandler,
+      'https://v2.jinrishici.com/one.json?client=browser-sdk/1.2&X-User-Token=' + encodeURIComponent(token)
+    )
   },
 
   sendRequest(callback, errHandler, apiUrl) {

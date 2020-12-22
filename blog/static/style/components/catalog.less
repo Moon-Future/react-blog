@@ -1,3 +1,12 @@
 .ant-anchor-wrapper {
-  max-height: calc(100vh - 150px) !important;
+  height: calc(100vh - 150px) !important;
+}
+
+@media screen and (max-width: 992px) {
+  .ant-anchor-wrapper {
+    height: calc(100vh - 30px) !important;
+  }
+  .ant-drawer-body {
+    padding: 0 5px;
+  }
 }
