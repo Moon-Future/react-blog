@@ -32,7 +32,7 @@ const Home = (props) => {
         <motion.div initial="initial" animate="enter" exit="exit" variants={sentenceVariants}>
           <PoetrySentence />
         </motion.div>
-        <div class="mobile-link">
+        <div className="mobile-link">
           <Link href="/article">Blog</Link>
         </div>
       </div>
