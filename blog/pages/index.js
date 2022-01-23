@@ -1,10 +1,14 @@
 import { motion } from 'framer-motion'
 import Head from 'next/head'
-import Link from 'next/link'
 import Header from '../components/Header'
 import PoetrySentence from '../components/PoetrySentence'
 import ScrollTop from '../components/ScrollTop'
 import '../static/style/pages/index.less'
+import { DownOutlined, createFromIconfontCN } from '@ant-design/icons'
+
+const MyIcon = createFromIconfontCN({
+  scriptUrl: '//at.alicdn.com/t/font_2220107_frnkhisqosw.js', // 在 iconfont.cn 上生成
+})
 
 const sentenceVariants = {
   initial: { scale: 0.96, opacity: 1 },
@@ -29,12 +33,17 @@ const Home = (props) => {
       <Header route={route} />
 
       <div className="page-background">
-        <motion.div initial="initial" animate="enter" exit="exit" variants={sentenceVariants}>
+        <motion.div className="page-content" initial="initial" animate="enter" exit="exit" variants={sentenceVariants}>
+          <span className="blog-desc">沉淀酝酿，厚积薄发</span>
           <PoetrySentence />
         </motion.div>
-        <div className="mobile-link">
-          <Link href="/article">Blog</Link>
+        <div className="scroll-down">
+          <MyIcon type="icon-scroll-down" />
         </div>
+      </div>
+
+      <div className="main-content">
+        222
       </div>
 
       <ScrollTop />

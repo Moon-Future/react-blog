@@ -1,3 +1,5 @@
+@import '../variable.less';
+
 .index-container {
   .comm-main {
     margin-top: 0;
@@ -8,6 +10,27 @@
   }
 }
 
+.page-content {
+  text-align: center;
+  color: #fff;
+  font-size: 2rem;
+  font-family: monospace, emoji, cursive, KaiTi, SimSun;
+}
+
+.scroll-down {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  span {
+    position: relative;
+    font-size: 30px;
+    line-height: 1.5;
+    cursor: pointer;
+    animation: scroll-down-effect 1.5s infinite;
+  }
+}
+
 .mobile-link {
   position: absolute;
   color: #fff;
@@ -15,6 +38,27 @@
   bottom: 10rem;
   border-bottom: 2px solid;
   padding: 2px 10px;
+}
+
+@keyframes scroll-down-effect {
+  0% {
+    top: 0;
+    opacity: 0.4;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
+    filter: alpha(opacity=40);
+  }
+  50% {
+    top: -16px;
+    opacity: 1;
+    -ms-filter: none;
+    filter: none;
+  }
+  100% {
+    top: 0;
+    opacity: 0.4;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
+    filter: alpha(opacity=40);
+  }
 }
 
 @media screen and (min-width: 500px) {

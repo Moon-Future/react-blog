@@ -6,6 +6,24 @@ body {
   padding: 0;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  &::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+  &::-webkit-scrollbar-track {
+    background: rgb(239, 239, 239);
+    border-radius: 2px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #49b1f5;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #49b1f5;
+  }
+  &::-webkit-scrollbar-corner {
+    background: #179a16;
+  }
 }
 html {
   overflow-x: hidden;
@@ -28,11 +46,16 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  height: 100vh;
+  background-attachment: fixed
+}
+
+.main-content {
+  color: @black;
+  margin: 0 auto;
+  padding: 40px 15px;
+  max-width: 1200px;
+  width: 100%;
 }
 
 .comm-main {

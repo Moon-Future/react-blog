@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { Row, Col, Menu } from 'antd'
+import { HomeFilled, CalendarFilled, TagFilled, FolderOpenFilled, HeartFilled } from '@ant-design/icons'
 import '../static/style/components/header.less'
 
 const Header = (props) => {
@@ -10,22 +10,33 @@ const Header = (props) => {
 
   return (
     <div className="header">
-      <div className="header-bg"></div>
-      <Row type="flex" justify="space-between" className="header-row">
-        <Col className="header-left" xs={0} sm={10} md={10} lg={10} xl={10}>
-          {/* <span className="header-txt">2</span> */}
-        </Col>
-        <Col xs={12} sm={12} md={12} lg={8} xl={6}>
-          <Menu mode="horizontal" selectedKeys={[selectedKey]}>
-            <Menu.Item key="/">
-              <Link href="/">首页</Link>
-            </Menu.Item>
-            <Menu.Item key="/article">
-              <Link href="/article">文章</Link>
-            </Menu.Item>
-          </Menu>
-        </Col>
-      </Row>
+      <div className="header-row">
+        <div className="header-name">
+          <span className="header-txt">沉酿</span>
+        </div>
+        <div className="header-menu">
+          <div className="menu-item">
+            <HomeFilled />
+            <Link href="/">首页</Link>
+          </div>
+          <div className="menu-item">
+            <CalendarFilled />
+            <Link href="/article">文档</Link>
+          </div>
+          <div className="menu-item">
+          <TagFilled />
+            <Link href="/article2">标签</Link>
+          </div>
+          <div className="menu-item">
+            <FolderOpenFilled />
+            <Link href="/article3">分类</Link>
+          </div>
+          <div className="menu-item">
+            <HeartFilled />
+            <Link href="/article4">关于</Link>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
