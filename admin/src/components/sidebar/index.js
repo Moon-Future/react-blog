@@ -1,15 +1,6 @@
 import './index.scss'
 import { Menu, Avatar } from 'antd'
 import { Link } from 'react-router-dom'
-// import {
-//   AppstoreOutlined,
-//   MenuUnfoldOutlined,
-//   MenuFoldOutlined,
-//   PieChartOutlined,
-//   DesktopOutlined,
-//   ContainerOutlined,
-//   MailOutlined,
-// } from '@ant-design/icons'
 
 const { SubMenu } = Menu
 
@@ -22,7 +13,8 @@ const menuList = [
       { title: '新增文章', url: '/addArticle' },
     ],
   },
-  { title: '文章标签', url: '/tag' },
+  { title: '目录', url: '/category' },
+  { title: '标签', url: '/tag' },
 ]
 
 export default function SideBar(props) {
@@ -30,7 +22,8 @@ export default function SideBar(props) {
   return (
     <div className="sidebar">
       <div className="logo">
-        <Avatar size={100} src={require('../../static/image/avatar.jpg').default} />
+        <Avatar className="avatar" size={50} src="https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/avatar/avatar-default.jpg" />
+        <span>Blog's Admin</span>
       </div>
       <Menu defaultSelectedKeys={['/']} selectedKeys={[pathname]} mode="inline" theme="dark">
         {menuList.map((ele, index) => {

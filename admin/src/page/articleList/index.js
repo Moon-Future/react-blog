@@ -18,6 +18,18 @@ class ArticleList extends Component {
         width: 250
       },
       {
+        title: '类别',
+        dataIndex: 'category',
+        render: (text, record) =>
+          text.map((ele) => {
+            return (
+              <Tag key={ele.id}>
+                {ele.name}
+              </Tag>
+            )
+          }),
+      },
+      {
         title: '标签',
         dataIndex: 'tag',
         render: (text, record) =>

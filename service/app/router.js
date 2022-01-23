@@ -15,6 +15,10 @@ module.exports = (app) => {
   router.post('/api/addTag', adminAuth, controller.tag.addTag)
   router.post('/api/delTag', adminAuth, controller.tag.delTag)
 
+  router.post('/api/getCategoryList', controller.category.getCategoryList)
+  router.post('/api/addCategory', adminAuth, controller.category.addCategory)
+  router.post('/api/delCategory', adminAuth, controller.category.delCategory)
+
   router.post('/api/register', controller.user.register)
   router.post('/api/login', controller.user.login)
   router.post('/api/checkAuth', controller.user.checkAuth)

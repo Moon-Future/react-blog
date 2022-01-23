@@ -10,6 +10,10 @@ const API = {
   addTag: HOST + '/api/addTag',
   delTag: HOST + '/api/delTag',
 
+  getCategoryList: HOST + '/api/getCategoryList',
+  addCategory: HOST + '/api/addCategory',
+  delCategory: HOST + '/api/delCategory',
+
   register: HOST + '/api/register',
   login: HOST + '/api/login',
 
