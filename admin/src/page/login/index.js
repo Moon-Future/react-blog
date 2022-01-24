@@ -13,6 +13,8 @@ export default function Login(props) {
   useEffect(() => {
     ajax.get('https://api.no0a.cn/api/bing/0').then((res) => {
       setBackground(res.data.bing.url)
+    }).catch(() => {
+      setBackground('https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/background/bg_default.jpg')
     })
   }, [])
 

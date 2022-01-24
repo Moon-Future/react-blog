@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
-import { Breadcrumb, Table, Space, Button, Modal, Input, Tag } from 'antd'
+import { Breadcrumb, Table, Space, Button, Modal, Input } from 'antd'
 import { Link } from 'react-router-dom'
 import ajax from '../../util/ajax'
-export default class ArticleTag extends Component {
+export default class ArticleCategory extends Component {
   constructor(props) {
     super(props)
     this.state = {

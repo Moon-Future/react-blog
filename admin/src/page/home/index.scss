@@ -2,10 +2,20 @@
   height: 100%;
 }
 
+.sider-container {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+}
+
 .header {
   background: #fff;
   text-align: right;
   padding: 0
+}
+
+.layout-container {
+  margin-left: 200px;
 }
 
 .content {

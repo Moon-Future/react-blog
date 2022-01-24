@@ -17,10 +17,10 @@ export default function Home(props) {
   return (
     <>
       <Layout className="container">
-        <Sider>
+        <Sider className="sider-container">
           <SideBar pathname={location.pathname} />
         </Sider>
-        <Layout>
+        <Layout className="layout-container">
           <Header className="header"><TopHeader {...props} /></Header>
           <Content className="content">
             <Switch>

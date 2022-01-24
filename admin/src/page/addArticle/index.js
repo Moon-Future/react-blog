@@ -176,11 +176,19 @@ class AddArticle extends Component {
 
   async submit(flag = true) {
     if (this.state.loading) return
-    const { title, content, summary, coverImg, topImg, backgroundImg, tags, categorySelected, addTime, updTime } = this.state
+    const { title, content, summary, coverImg, topImg, backgroundImg, tags, categories, categorySelected, addTime, updTime } = this.state
     const selectedTag = []
+    const tagsName = []
+    const categoriesName = []
     tags.forEach((ele) => {
       if (ele.selected) {
         selectedTag.push(ele.id)
+        tagsName.push(ele.name)
+      }
+    })
+    categories.forEach((ele) => {
+      if (categorySelected.includes(ele.id)) {
+        categoriesName.push(ele.name)
       }
     })
     if (title === '') {
@@ -207,7 +215,9 @@ class AddArticle extends Component {
         topImg,
         backgroundImg,
         tags: selectedTag,
+        tagsName,
         categories: categorySelected,
+        categoriesName,
         addTime: addTime && addTime.valueOf(),
         updTime: updTime && updTime.valueOf(),
         flag,

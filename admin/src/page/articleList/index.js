@@ -23,7 +23,7 @@ class ArticleList extends Component {
         render: (text, record) =>
           text.map((ele) => {
             return (
-              <Tag key={ele.id}>
+              <Tag key={ele.id} style={{marginBottom: '10px'}}>
                 {ele.name}
               </Tag>
             )
@@ -35,7 +35,7 @@ class ArticleList extends Component {
         render: (text, record) =>
           text.map((ele) => {
             return (
-              <Tag color={ele.background} style={{ color: ele.color }} key={ele.id}>
+              <Tag color={ele.background} style={{ color: ele.color, marginBottom: '10px' }} key={ele.id}>
                 {ele.name}
               </Tag>
             )

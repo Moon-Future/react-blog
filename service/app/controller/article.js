@@ -3,10 +3,43 @@ const shortid = require('shortid')
 const fs = require('fs')
 const path = require('path')
 const filePath = path.resolve(__dirname, '../../article')
+const { formatTime } = require('../../utils/index')
 const Controller = require('egg').Controller
+const { format } = require('path')
 
 if (!fs.existsSync(filePath)) {
   fs.mkdirSync(filePath)
+}
+
+// 添加 front-matter，用于 hexo
+function writeContent(params) {
+  const { title, content, summary, coverImg, topImg, backgroundImg, tagsName, categoriesName, addTime, updTime } = params
+  let categoryStr = ''
+  let tagStr = ''
+  categoriesName.forEach(ele => {
+    categoryStr += `\n  - ${ele}`
+  })
+  tagsName.forEach(ele => {
+    tagStr += `\n  - ${ele}`
+  })
+  const frontMatter =
+`---
+title: ${title}
+date: ${formatTime(addTime || Date.now(), 'yyyy-MM-dd hh:mm:sss')}
+description: ${summary}
+categories: ${categoryStr}
+tags: ${tagStr}
+cover: ${coverImg}
+top_img: ${topImg}
+---
+
+`
+  const markdownContent = frontMatter + content
+  return markdownContent
+}
+
+function formatContent(content) {
+  return content.replace(/---(.*?)---/sg, '').trim()
 }
 
 class ArticleController extends Controller {
@@ -78,7 +111,8 @@ class ArticleController extends Controller {
       })
       result.tag = tag
       result.category = category
-      result.mdContent = fs.readFileSync(path.join(filePath, result.title + '.md'), 'utf-8')
+      let mdContend = fs.readFileSync(path.join(filePath, result.title + '.md'), 'utf-8')
+      result.mdContent = formatContent(mdContend)
       this.ctx.body = result
     } else {
       this.ctx.status = 400
@@ -88,83 +122,109 @@ class ArticleController extends Controller {
 
   // 新增、更新文章
   async addArticle() {
-    const { id, title, content, summary, coverImg, topImg, backgroundImg, tags, categories, flag, addTime, updTime, userId } = this.ctx.request.body
-    const userInfo = this.ctx.userInfo
-    const data = {
-      title,
-      summary,
-      cover: coverImg,
-      topImg,
-      backgroundImg,
-      tag: tags.join(','),
-      category: categories.join(','),
-      add_time: addTime || Date.now(),
-      state: userInfo.root ? (flag ? 1 : 0) : 0,
-    }
-    if (id) {
-      // 更新
-      data.id = id
-      data.upd_time = updTime
-      const result = await this.app.mysql.get('article', { id })
-      // 非管理员不能更新他人文章
-      if (userInfo.id !== result.user_id && !userInfo.root) {
-        this.ctx.status = 403
-        this.ctx.body = { message: '没有权限' }
-        return
+    const { ctx, app } = this
+    const conn = await app.mysql.beginTransaction()
+    try {
+      const { id, title, summary, coverImg, topImg, backgroundImg, tags, categories, flag, addTime, updTime, userId } = ctx.request.body
+      const userInfo = ctx.userInfo
+      const data = {
+        title,
+        summary,
+        cover: coverImg,
+        topImg,
+        backgroundImg,
+        tag: tags.join(','),
+        category: categories.join(','),
+        add_time: addTime || Date.now(),
+        state: userInfo.root ? (flag ? 1 : 0) : 0,
       }
-      const res = await this.app.mysql.update('article', data)
-      const insertSuccess = res.affectedRows === 1
-      if (insertSuccess) {
-        if (result.title !== title) {
-          fs.renameSync(path.join(filePath, result.title + '.md'), path.join(filePath, title + '.md'))
+      if (id) {
+        // 更新
+        data.id = id
+        data.upd_time = updTime
+        const result = await conn.get('article', { id })
+        // 非管理员不能更新他人文章
+        if (userInfo.id !== result.user_id && !userInfo.root) {
+          ctx.status = 403
+          ctx.body = { message: '没有权限' }
+          return
         }
-        fs.writeFileSync(path.join(filePath, title + '.md'), content, 'utf-8')
-        this.ctx.body = { message: '更新成功' }
-      } else {
-        this.ctx.status = 400
-        this.ctx.body = { message: '更新失败，请稍后重试' }
-      }
-    } else {
-      // 新增
-      data.id = shortid.generate()
-      data.user_id = userId
-      data.view = 0
-      const result = await this.app.mysql.get('article', { title })
-      if (result) {
-        this.ctx.status = 400
-        this.ctx.body = {
-          message: '文章标题已存在',
-        }
-      } else {
-        const res = await this.app.mysql.insert('article', data)
+        const res = await conn.update('article', data)
         const insertSuccess = res.affectedRows === 1
         if (insertSuccess) {
-          // 文章内容写入文件
-          fs.writeFileSync(path.join(filePath, title + '.md'), content, 'utf-8')
-          this.ctx.body = { message: '新增成功' }
+          if (result.title !== title) {
+            fs.renameSync(path.join(filePath, result.title + '.md'), path.join(filePath, title + '.md'))
+          }
+          const markdownContent = writeContent(ctx.request.body)
+          fs.writeFileSync(path.join(filePath, title + '.md'), markdownContent, 'utf-8')
+          await conn.commit()
+          ctx.body = { message: '更新成功' }
         } else {
-          this.ctx.status = 400
-          this.ctx.body = { message: '新增失败，请稍后重试' }
+          await conn.rollback()
+          ctx.status = 400
+          ctx.body = { message: '更新失败，请稍后重试' }
+        }
+      } else {
+        // 新增
+        data.id = shortid.generate()
+        data.user_id = userId
+        data.view = 0
+        const result = await conn.get('article', { title })
+        if (result) {
+          ctx.status = 400
+          ctx.body = {
+            message: '文章标题已存在',
+          }
+        } else {
+          const res = await conn.insert('article', data)
+          const insertSuccess = res.affectedRows === 1
+          if (insertSuccess) {
+            // 文章内容写入文件
+            const markdownContent = writeContent(ctx.request.body)
+            fs.writeFileSync(path.join(filePath, title + '.md'), markdownContent, 'utf-8')
+            await conn.commit()
+            ctx.body = { message: '新增成功' }
+          } else {
+            await conn.rollback()
+            ctx.status = 400
+            ctx.body = { message: '新增失败，请稍后重试' }
+          }
         }
       }
+    } catch (e) {
+      await conn.rollback()
+      console.log(e)
+      ctx.status = 400
+      ctx.body = { message: '服务端出错' }
     }
   }
 
   async delArticle() {
-    const { id } = this.ctx.request.body
-    const userInfo = this.ctx.userInfo
-    const article = await this.app.mysql.get('article', { id: id }) 
-    if (userInfo.id != article.user_id && !userInfo.root) {
-      this.ctx.status = 403
-      this.ctx.body = { message: '没有权限' }
-      return
-    }
-    const request = await this.app.mysql.update('article', { id, off: 1 })
-    if (request.affectedRows === 1) {
-      this.ctx.body = { message: '成功' }
-    } else {
-      this.ctx.status = 400
-      this.ctx.body = { message: '失败，请稍后重试' }
+    const { ctx, app } = this
+    const conn = await app.mysql.beginTransaction()
+    try {
+      const { id } = ctx.request.body
+      const userInfo = ctx.userInfo
+      const article = await conn.get('article', { id: id }) 
+      if (userInfo.id != article.user_id && !userInfo.root) {
+        ctx.status = 403
+        ctx.body = { message: '没有权限' }
+        return
+      }
+      const request = await conn.update('article', { id, off: 1 })
+      if (request.affectedRows === 1) {
+        await conn.commit()
+        ctx.body = { message: '成功' }
+      } else {
+        await conn.rollback()
+        ctx.status = 400
+        ctx.body = { message: '失败，请稍后重试' }
+      }
+    } catch (e) {
+      await conn.rollback()
+      console.log(e)
+      ctx.status = 400
+      ctx.body = { message: '服务端出错' }
     }
   }
 }
