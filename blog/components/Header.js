@@ -10,9 +10,12 @@ const Header = (props) => {
 
   return (
     <div className="header">
+      <div className="header-background"></div>
       <div className="header-row">
         <div className="header-name">
-          <span className="header-txt">沉酿</span>
+          <span className="header-txt">
+            <Link href="/">沉酿</Link>
+          </span>
         </div>
         <div className="header-menu">
           <div className="menu-item">

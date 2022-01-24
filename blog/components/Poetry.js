@@ -6,7 +6,7 @@ const Poetry = (props) => {
   const sentence = poetry && poetry.sentence || ''
 
   return poetry ? (
-    <div className="poetry-box comm-box">
+    <div className="poetry-box card-box">
       <div className="poetry-content">
         {poetry.origin.content.map((ele, i) => {
           const index = ele.indexOf(sentence)

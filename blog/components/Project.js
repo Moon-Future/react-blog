@@ -3,9 +3,9 @@ import '../static/style/components/project.less'
 
 const Project = () => {
   return (
-    <div className="project-div comm-box">
+    <div className="project-div card-box">
       <div className="project-item">
-        <Image src="../static/images/project-01.png" width={100} />
+        <Image src="../static/images/project-01.png" width={100} preview={false} />
         <div className="projec-txt">
           <p className="project-title">垃圾分类小程序</p>
           <p className="project-descr">快来看看你是什么垃圾吧~</p>
