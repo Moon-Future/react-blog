@@ -1,0 +1,43 @@
+.recent-div {
+  padding: 1rem;
+
+  .recent-headline {
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    .recent-title {
+      margin-left: 5px;
+    }
+  }
+  
+  .recent-item {
+    display: flex;
+    justify-content: flex-start;
+    &:not(:last-child) {
+      border-bottom: 1px dashed #f5f5f5;
+    }
+
+    .recent-cover {
+      width: 4rem;
+      flex: 0 0 auto;
+      overflow: hidden;
+      img {
+        transition: all 0.6s;
+        &:hover {
+          transform: scale(1.2);
+        }
+      }
+    }
+    
+    .recent-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin-left: 10px;
+
+      .recent-date {
+        color: #858585;
+      }
+    }
+  }
+}

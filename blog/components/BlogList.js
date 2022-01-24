@@ -5,12 +5,6 @@ import '../static/style/components/blogList.less'
 import { CalendarFilled, FolderOpenFilled, TagFilled } from '@ant-design/icons'
 import { formatTime } from '../util/index'
 
-const MyImage = React.forwardRef((params, ref) => {
-  return (
-    <Image width={'100%'} preview={false} src={params.cover} />
-  )
-})
-
 const BlogList = (props) => {
   const [articleList] = useState(props.articleList)
   const defaultCover = 'https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/cover-default_02.jpg'
@@ -24,12 +18,12 @@ const BlogList = (props) => {
           <List.Item className="list-item card-box">
             <div className={`item-cover ${index % 2 !== 0 ? 'right' : ''}`}>
               <Link href={'/detailed?id=' + item.id}>
-                <MyImage cover={item.cover || defaultCover} />
+                <a><Image width={'100%'} preview={false} src={item.cover || defaultCover} /></a>
               </Link>
             </div>
             <div className="item-info"> 
               <Link href={'/detailed?id=' + item.id}>
-                <div className="item-title">{item.title}</div>
+                <div className="item-title ellipsis-txt">{item.title}</div>
               </Link>
               <div className="item-meta">
                 <span className="item-meta-wrapper">

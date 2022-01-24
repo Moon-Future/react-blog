@@ -1,19 +1,21 @@
-import React, { useState } from 'react'
-import Link from 'next/link'
-import { List, Image } from 'antd'
+import React from 'react'
 import '../static/style/components/asideCard.less'
 
 import Author from './Author'
 import Project from './Project'
+import RecentBlog from './RecentBlog'
+import TagCard from './TagCard'
+import CategoryCard from './CategoryCard'
 
 const RightCard = (props) => {
-  const [articleList] = useState(props.articleList)
-  const defaultCover = 'https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/cover-default_02.jpg'
 
   return (
     <>
       <Author />
       <Project />
+      <RecentBlog />
+      <TagCard />
+      <CategoryCard />
     </>
   )
 }
