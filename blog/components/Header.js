@@ -1,12 +1,12 @@
 import React from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { HomeFilled, CalendarFilled, TagFilled, FolderOpenFilled, HeartFilled } from '@ant-design/icons'
 import '../static/style/components/header.less'
 
 const Header = (props) => {
   const { route } = props
-  // const selectedKey = route === '/article' || route === '/detailed' ? '/article' : route
-  const selectedKey = route
+  const router = useRouter()
 
   return (
     <div className="header">
@@ -18,26 +18,44 @@ const Header = (props) => {
           </span>
         </div>
         <div className="header-menu">
-          <div className="menu-item">
+          <a className="menu-item" onClick={() => router.push('/')}>
             <HomeFilled />
-            <Link href="/">首页</Link>
-          </div>
-          <div className="menu-item">
-            <CalendarFilled />
-            <Link href="/article">文档</Link>
-          </div>
-          <div className="menu-item">
-          <TagFilled />
-            <Link href="/article2">标签</Link>
-          </div>
-          <div className="menu-item">
-            <FolderOpenFilled />
-            <Link href="/article3">分类</Link>
-          </div>
-          <div className="menu-item">
-            <HeartFilled />
-            <Link href="/article4">关于</Link>
-          </div>
+            <span>首页</span>
+          </a>
+          <a className="menu-item" onClick={() => router.push('/category')}>
+            <HomeFilled />
+            <span>分类</span>
+          </a>
+          <Link href="/">
+            <a className="menu-item">
+              <HomeFilled />
+              <span>首页</span>
+            </a>
+          </Link>
+          <Link href="/archives">
+            <a className="menu-item">
+              <HomeFilled />
+              <span>文档</span>
+            </a>
+          </Link>
+          <Link href="/tag">
+            <a className="menu-item">
+              <HomeFilled />
+              <span>标签</span>
+            </a>
+          </Link>
+          <Link href="/category">
+            <a className="menu-item">
+              <HomeFilled />
+              <span>分类</span>
+            </a>
+          </Link>
+          <Link href="/about">
+            <a className="menu-item">
+              <HomeFilled />
+              <span>关于</span>
+            </a>
+          </Link>
         </div>
       </div>
     </div>

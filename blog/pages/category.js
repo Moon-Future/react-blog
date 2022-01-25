@@ -4,7 +4,7 @@ import PoetrySentence from '../components/PoetrySentence'
 import Layout from '../components/Layout'
 import AsideCard from '../components/AsideCard'
 import Pagination from '../components/Pagination'
-import BlogList from '../components/BlogList'
+import TimelineList from '../components/TimelineList'
 import '../static/style/pages/index.less'
 import { createFromIconfontCN } from '@ant-design/icons'
 import axios from 'axios'
@@ -18,10 +18,10 @@ const Home = (props) => {
   const [articleList, setArticleList] = useState(props.articleList)
   const [current, setCurrent] = useState(props.current)
   const { tags, categories, count, recentArticle } = props
-  console.log('index', props)
+  console.log('category', props)
 
   useEffect(() => {
-    console.log('index useEffect')
+    console.log('category useEffect')
   }, [])
 
   const onChangePage = (page) => {
@@ -34,13 +34,14 @@ const Home = (props) => {
     setArticleList(result.data.articleList)
   }
 
+
   return (
     <div className="container index-container">
       <Head>
         <title>欢迎来到我的世界</title>
       </Head>
 
-      <div>index</div>
+      <div>category</div>
 
       <Layout
         top={
@@ -54,7 +55,7 @@ const Home = (props) => {
             </div>
           </div>
         }
-        main={<BlogList articleList={articleList} />}
+        main={<TimelineList articleList={articleList} />}
         aside={<AsideCard tags={tags} categories={categories} recentArticle={recentArticle} />}
         pagination={<Pagination count={count} current={current} onChangePage={onChangePage} />}
       >

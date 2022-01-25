@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import { List, Image } from 'antd'
 import '../static/style/components/blogList.less'
@@ -6,7 +6,7 @@ import { CalendarFilled, FolderOpenFilled, TagFilled } from '@ant-design/icons'
 import { formatTime } from '../util/index'
 
 const BlogList = (props) => {
-  const [articleList] = useState(props.articleList)
+  const { articleList } = props
   const defaultCover = 'https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/cover-default_02.jpg'
 
   return (
@@ -23,7 +23,7 @@ const BlogList = (props) => {
             </div>
             <div className="item-info"> 
               <Link href={'/detailed?id=' + item.id}>
-                <div className="item-title ellipsis-txt">{item.title}</div>
+                <a className="item-title ellipsis-txt">{item.title}</a>
               </Link>
               <div className="item-meta">
                 <span className="item-meta-wrapper">
@@ -36,7 +36,7 @@ const BlogList = (props) => {
                       <FolderOpenFilled />
                       {item.category.map((ele) => (
                         <span className="item-meta-tag" key={ele.id}>
-                          <Link href={'/detailed?id=' + item.id}>{ele.name}</Link>
+                          <Link href={'/category?id=' + item.id}>{ele.name}</Link>
                         </span>
                       ))}
                     </span>
@@ -49,7 +49,7 @@ const BlogList = (props) => {
                       <TagFilled />
                       {item.tag.map((ele) => (
                         <span className="item-meta-tag" key={ele.id}>
-                          <Link href={'/detailed?id=' + item.id}>{ele.name}</Link>
+                          <Link href={'/tag?id=' + item.id}>{ele.name}</Link>
                         </span>
                       ))}
                     </span>

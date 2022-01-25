@@ -8,14 +8,15 @@ import TagCard from './TagCard'
 import CategoryCard from './CategoryCard'
 
 const RightCard = (props) => {
+  const { tags, categories, recentArticle } = props
 
   return (
     <>
       <Author />
       <Project />
-      <RecentBlog />
-      <TagCard />
-      <CategoryCard />
+      <RecentBlog recentArticle={recentArticle} />
+      <CategoryCard categories={categories} />
+      <TagCard tags={tags} />
     </>
   )
 }

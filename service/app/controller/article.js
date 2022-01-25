@@ -42,31 +42,96 @@ function formatContent(content) {
   return content.replace(/---(.*?)---/sg, '').trim()
 }
 
+function formatData(data, tags, categories) {
+  data.forEach((item) => {
+    const tagSplit = (item.tag || '').split(',')
+    const categorySplit = (item.category || '').split(',')
+    const tag = []
+    const category = []
+    tags.forEach((ele) => {
+      if (tagSplit.includes(ele.id + '')) {
+        tag.push({ id: ele.id, name: ele.name, color: ele.color, background: ele.background })
+      }
+    })
+    categories.forEach((ele) => {
+      if (categorySplit.includes(ele.id + '')) {
+        category.push({ id: ele.id, name: ele.name, desc: ele.desc })
+      }
+    })
+    item.tag = tag
+    item.category = category
+  })
+  return data
+}
+
 class ArticleController extends Controller {
+  // 前端主页数据
+  async getHomeData() {
+    const { ctx, app } = this
+    try {
+      const { page = 1 } = ctx.request.body
+      const pageSize = 10
+      const tags = await app.mysql.select('tag')
+      const categories = await app.mysql.select('category')
+      const recentArticle = await app.mysql.query(`SELECT * FROM article WHERE off != 1 ORDER BY add_time DESC LIMIT ?, ?`, [0, 5])
+      const count = await app.mysql.query(`SELECT COUNT(*) as count FROM article WHERE off != 1`)
+      let articleList = await app.mysql.query(`SELECT * FROM article WHERE off != 1 ORDER BY add_time DESC LIMIT ?, ?`, [(page - 1) * pageSize, pageSize])
+      articleList = formatData(articleList, tags, categories)
+      ctx.body = { articleList, tags, categories, count: count[0].count, recentArticle }
+    } catch (e) {
+      ctx.status = 400
+      ctx.body = { message: '/(ㄒoㄒ)/~~ 服务器开小差啦' }
+    }
+  }
+
+  // 前端主页分页数据
+  async getArticleData() {
+    const { ctx, app } = this
+    try {
+      const { page = 1 } = ctx.request.body
+      const pageSize = 10
+      const tags = await app.mysql.select('tag')
+      const categories = await app.mysql.select('category')
+      let articleList = await app.mysql.query(`SELECT * FROM article WHERE off != 1 ORDER BY add_time DESC LIMIT ?, ?`, [(page - 1) * pageSize, pageSize])
+      articleList = formatData(articleList, tags, categories)
+      ctx.body = { articleList }
+    } catch (e) {
+      ctx.status = 400
+      ctx.body = { message: '/(ㄒoㄒ)/~~ 服务器开小差啦' }
+    }
+  }
+
+
   // 获取文章列表
   async getArticleList() {
-    const result = await this.app.mysql.query('SELECT a.*, b.username, b.nickname FROM article as a, user as b WHERE a.off != 1 AND a.user_id = b.id ORDER BY a.add_time DESC')
-    const tagAll = await this.app.mysql.select('tag')
-    const categoryAll = await this.app.mysql.select('category')
-    result.forEach((item) => {
-      const tagSplit = (item.tag || '').split(',')
-      const categorySplit = (item.category || '').split(',')
-      const tag = []
-      const category = []
-      tagAll.forEach((ele) => {
-        if (tagSplit.includes(ele.id + '')) {
-          tag.push({ id: ele.id, name: ele.name, color: ele.color, background: ele.background })
-        }
+    const { ctx, app } = this
+    try {
+      const result = await app.mysql.query('SELECT a.*, b.username, b.nickname FROM article as a, user as b WHERE a.off != 1 AND a.user_id = b.id ORDER BY a.add_time DESC')
+      const tagAll = await app.mysql.select('tag')
+      const categoryAll = await app.mysql.select('category')
+      result.forEach((item) => {
+        const tagSplit = (item.tag || '').split(',')
+        const categorySplit = (item.category || '').split(',')
+        const tag = []
+        const category = []
+        tagAll.forEach((ele) => {
+          if (tagSplit.includes(ele.id + '')) {
+            tag.push({ id: ele.id, name: ele.name, color: ele.color, background: ele.background })
+          }
+        })
+        categoryAll.forEach((ele) => {
+          if (categorySplit.includes(ele.id + '')) {
+            category.push({ id: ele.id, name: ele.name, desc: ele.desc })
+          }
+        })
+        item.tag = tag
+        item.category = category
       })
-      categoryAll.forEach((ele) => {
-        if (categorySplit.includes(ele.id + '')) {
-          category.push({ id: ele.id, name: ele.name, desc: ele.desc })
-        }
-      })
-      item.tag = tag
-      item.category = category
-    })
-    this.ctx.body = result
+      ctx.body = result
+    } catch (e) {
+      ctx.status = 400
+      ctx.body = { message: '/(ㄒoㄒ)/~~ 服务器开小差啦' }
+    }
   }
 
   async getArticle() {

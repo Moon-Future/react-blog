@@ -1,28 +1,23 @@
-.recent-div {
-  padding: 1rem;
-
-  .recent-headline {
-    font-size: 1.2rem;
-    display: flex;
-    align-items: center;
-    .recent-title {
-      margin-left: 5px;
-    }
-  }
+.recent-box {
   
   .recent-item {
     display: flex;
     justify-content: flex-start;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 0.8rem;
     &:not(:last-child) {
       border-bottom: 1px dashed #f5f5f5;
     }
 
     .recent-cover {
-      width: 4rem;
+      width: 3.6rem;
+      height: 3.6rem;
       flex: 0 0 auto;
       overflow: hidden;
       img {
         transition: all 0.6s;
+        height: 100%;
         &:hover {
           transform: scale(1.2);
         }

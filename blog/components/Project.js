@@ -3,7 +3,7 @@ import '../static/style/components/project.less'
 
 const Project = () => {
   return (
-    <div className="project-div card-box">
+    <div className="project-box card-box">
       <div className="project-item">
         <Image src="../static/images/project-01.png" width={100} preview={false} />
         <div className="project-txt">

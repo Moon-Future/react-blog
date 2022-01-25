@@ -1,28 +1,24 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import Head from 'next/head'
 import PoetrySentence from '../components/PoetrySentence'
 import Layout from '../components/Layout'
 import AsideCard from '../components/AsideCard'
 import Pagination from '../components/Pagination'
-import BlogList from '../components/BlogList'
 import '../static/style/pages/index.less'
 import { createFromIconfontCN } from '@ant-design/icons'
 import axios from 'axios'
-import { SSRAPI, API } from '../config/api'
+import { API } from '../config/api'
+import BlogList from '../components/BlogList'
+import TimelineList from '../components/TimelineList'
 
 const MyIcon = createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2220107_frnkhisqosw.js', // 在 iconfont.cn 上生成
 })
 
-const Home = (props) => {
+const PageComponent = (props) => {
   const [articleList, setArticleList] = useState(props.articleList)
   const [current, setCurrent] = useState(props.current)
   const { tags, categories, count, recentArticle } = props
-  console.log('index', props)
-
-  useEffect(() => {
-    console.log('index useEffect')
-  }, [])
 
   const onChangePage = (page) => {
     setCurrent(page)
@@ -34,13 +30,12 @@ const Home = (props) => {
     setArticleList(result.data.articleList)
   }
 
+
   return (
     <div className="container index-container">
       <Head>
         <title>欢迎来到我的世界</title>
       </Head>
-
-      <div>index</div>
 
       <Layout
         top={
@@ -54,7 +49,14 @@ const Home = (props) => {
             </div>
           </div>
         }
-        main={<BlogList articleList={articleList} />}
+        main={() => {
+          switch(props.main) {
+            case 'index':
+              return <BlogList articleList={articleList} />
+            case 'category':
+              return <TimelineList articleList={articleList} />
+          }
+        }}
         aside={<AsideCard tags={tags} categories={categories} recentArticle={recentArticle} />}
         pagination={<Pagination count={count} current={current} onChangePage={onChangePage} />}
       >
@@ -63,23 +65,4 @@ const Home = (props) => {
   )
 }
 
-export async function getServerSideProps(context) {
-  try {
-    const page = context.query.page ? Number(context.query.page) : 1
-    if (isNaN(page)) {
-      return {
-        props: { articleList: [], tags: [], categories: [], count: 0, current: 1, recentArticle: [] }
-      }
-    }
-    const result = await axios.post(SSRAPI.getHomeData, { page })
-    return {
-      props: { ...result.data, current: page }, // will be passed to the page component as props
-    }
-  } catch (e) {
-    return {
-      props: { articleList: [], tags: [], categories: [], count: 0, current: 1, recentArticle: [] } // will be passed to the page component as props
-    }
-  }
-}
-
-export default Home
+export default PageComponent

@@ -6,36 +6,23 @@ import { HistoryOutlined } from '@ant-design/icons'
 import { formatTime } from '../util/index'
 
 const RecentBlog = (props) => {
-  const recentList = [
-    {
-      id: '111',
-      title: '222',
-      cover: 'https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/cover-default_01.jpg',
-      add_time: 1643040840590
-    },
-    {
-      id: '222',
-      title: '22211',
-      cover: 'https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/cover-default_01.jpg',
-      add_time: 1643040840590
-    }
-  ]
+  const { recentArticle } = props
   const defaultCover = 'https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/cover-default_02.jpg'
 
   return (
-    <div className="recent-div card-box">
-      <div className="recent-headline">
+    <div className="recent-box card-box">
+      <div className="card-headline">
         <HistoryOutlined />
-        <span className="recent-title">最新文章</span>
+        <span className="card-title">最新文章</span>
       </div>
       <List
         itemLayout="vertical"
-        dataSource={recentList}
+        dataSource={recentArticle}
         renderItem={(item) => (
           <List.Item className="recent-item">
             <div className="recent-cover">
               <Link href={'/detailed?id=' + item.id}>
-                <a><Image width={'100%'} preview={false} src={item.cover || defaultCover} /></a>
+                <a><Image width={'100%'} height={'100%'} preview={false} src={item.cover || defaultCover} /></a>
               </Link>
             </div>
             <div className="recent-info">
