@@ -24,7 +24,7 @@ class CategoryController extends Controller {
       request = await this.app.mysql.update('category', { id, name, desc })
     } else {
       request = await this.app.mysql.insert('category', {
-        id: count + 1,
+        id: `a${count + 1}a`,
         name,
         desc
       })

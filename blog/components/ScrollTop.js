@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Anchor } from 'antd'
-import { RocketTwoTone } from '@ant-design/icons'
 import '../static/style/components/scrollTop.less'
+import { RocketTwoTone } from '@ant-design/icons'
 
 const { Link } = Anchor
 

@@ -7,31 +7,26 @@ import '../static/style/pages/index.less'
 import axios from 'axios'
 import { SSRAPI, API } from '../config/api'
 
-const CategoryPage = (props) => {
-  const { articleList, tags, categories, count, recentArticle, id } = props
+const ArchivePage = (props) => {
+  const { articleList, tags, categories, count, recentArticle } = props
   const [current, setCurrent] = useState(props.current)
   const [pageData, setPageData] = useState({
-    title: '分类',
-    type: '2',
+    title: '文章总览',
+    type: '1',
     typeName: '',
-    typeList: categories,
+    typeList: tags,
     count,
     articleList
   })
 
   useEffect(() => {
-    const result = categories.find((ele) => {
-      return ele.id === id
-    })
-    const categoryName = result && result.name || ''
     const dataList = formatData(articleList)
     setPageData({
       ...pageData,
       count,
-      typeName: categoryName,
       articleList: dataList
     })
-  }, [id])
+  }, [])
 
   const formatData = (data) => {
     const keys = []
@@ -72,28 +67,25 @@ const CategoryPage = (props) => {
 
   return (
     <div className="container index-container">
-      <Layout pageDesc="分类">
+      <Layout pageDesc="文档">
         <TimelineList pageData={pageData} key="main" />
         <AsideCard tags={tags} categories={categories} recentArticle={recentArticle} key="aside" />
-        {
-          id ? <Pagination count={count} current={current} onChangePage={onChangePage} key="pagination" /> : ''
-        }
+        <Pagination count={count} current={current} onChangePage={onChangePage} key="pagination" />
       </Layout>
     </div>
   )
 }
 
-CategoryPage.getLayout = (page) => {
+ArchivePage.getLayout = (page) => {
   return page
 }
 
 export async function getServerSideProps(context) {
   try {
     const page = 1
-    const id = context.query.id || ''
-    const result = await axios.post(SSRAPI.getHomeData, { page, categoryId: id })
+    const result = await axios.post(SSRAPI.getHomeData, { page })
     return {
-      props: { ...result.data, current: page, id }, // will be passed to the page component as props
+      props: { ...result.data, current: page }, // will be passed to the page component as props
     }
   } catch (e) {
     return {
@@ -102,4 +94,4 @@ export async function getServerSideProps(context) {
   }
 }
 
-export default CategoryPage
+export default ArchivePage

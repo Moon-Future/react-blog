@@ -91,3 +91,10 @@ export const getPoetry = {
     }
   },
 }
+
+// 随机数
+
+export const getRandomNumberByRange = (start, end) => {
+  return Math.floor(Math.random() * (end - start) + start)
+}
+

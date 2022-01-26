@@ -25,7 +25,7 @@ class TagController extends Controller {
       request = await this.app.mysql.update('tag', { id, name, color, background })
     } else {
       request = await this.app.mysql.insert('tag', {
-        id: count + 1,
+        id: `a${count + 1}a`,
         name,
         color,
         background,

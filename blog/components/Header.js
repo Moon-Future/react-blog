@@ -1,13 +1,8 @@
-import React from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { HomeFilled, CalendarFilled, TagFilled, FolderOpenFilled, HeartFilled } from '@ant-design/icons'
 import '../static/style/components/header.less'
 
-const Header = (props) => {
-  const { route } = props
-  const router = useRouter()
-
+const Header = () => {
   return (
     <div className="header">
       <div className="header-background"></div>
@@ -18,41 +13,33 @@ const Header = (props) => {
           </span>
         </div>
         <div className="header-menu">
-          <a className="menu-item" onClick={() => router.push('/')}>
-            <HomeFilled />
-            <span>首页</span>
-          </a>
-          <a className="menu-item" onClick={() => router.push('/category')}>
-            <HomeFilled />
-            <span>分类</span>
-          </a>
-          <Link href="/">
+          <Link href="/" >
             <a className="menu-item">
               <HomeFilled />
               <span>首页</span>
             </a>
           </Link>
-          <Link href="/archives">
+          <Link href="/archive">
             <a className="menu-item">
-              <HomeFilled />
+              <CalendarFilled />
               <span>文档</span>
             </a>
           </Link>
           <Link href="/tag">
             <a className="menu-item">
-              <HomeFilled />
+              <TagFilled />
               <span>标签</span>
             </a>
           </Link>
           <Link href="/category">
             <a className="menu-item">
-              <HomeFilled />
+              <FolderOpenFilled />
               <span>分类</span>
             </a>
           </Link>
           <Link href="/about">
             <a className="menu-item">
-              <HomeFilled />
+              <HeartFilled />
               <span>关于</span>
             </a>
           </Link>

@@ -1,28 +1,16 @@
-import React, { useState, useEffect } from 'react'
-import Head from 'next/head'
-import PoetrySentence from '../components/PoetrySentence'
+import { useState } from 'react'
 import Layout from '../components/Layout'
 import AsideCard from '../components/AsideCard'
 import Pagination from '../components/Pagination'
 import BlogList from '../components/BlogList'
 import '../static/style/pages/index.less'
-import { createFromIconfontCN } from '@ant-design/icons'
 import axios from 'axios'
 import { SSRAPI, API } from '../config/api'
 
-const MyIcon = createFromIconfontCN({
-  scriptUrl: '//at.alicdn.com/t/font_2220107_frnkhisqosw.js', // 在 iconfont.cn 上生成
-})
-
 const Home = (props) => {
+  const { tags, categories, count, recentArticle } = props
   const [articleList, setArticleList] = useState(props.articleList)
   const [current, setCurrent] = useState(props.current)
-  const { tags, categories, count, recentArticle } = props
-  console.log('index', props)
-
-  useEffect(() => {
-    console.log('index useEffect')
-  }, [])
 
   const onChangePage = (page) => {
     setCurrent(page)
@@ -36,31 +24,17 @@ const Home = (props) => {
 
   return (
     <div className="container index-container">
-      <Head>
-        <title>欢迎来到我的世界</title>
-      </Head>
-
-      <div>index</div>
-
-      <Layout
-        top={
-          <div className="page-background">
-            <div className="page-content">
-              <span className="blog-desc">沉淀酝酿，厚积薄发</span>
-              <PoetrySentence />
-            </div>
-            <div className="scroll-down">
-              <MyIcon type="icon-scroll-down" />
-            </div>
-          </div>
-        }
-        main={<BlogList articleList={articleList} />}
-        aside={<AsideCard tags={tags} categories={categories} recentArticle={recentArticle} />}
-        pagination={<Pagination count={count} current={current} onChangePage={onChangePage} />}
-      >
+      <Layout homeFlag={true}>
+        <BlogList articleList={articleList} key="main" />
+        <AsideCard tags={tags} categories={categories} recentArticle={recentArticle} key="aside" />
+        <Pagination count={count} current={current} onChangePage={onChangePage} seoShow key="pagination" />
       </Layout>
     </div>
   )
+}
+
+Home.getLayout = (page) => {
+  return page
 }
 
 export async function getServerSideProps(context) {

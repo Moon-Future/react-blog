@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Pagination } from 'antd'
 
 const PaginationComponent = (props) => {
-  const { count, current } = props
+  const { count, current, seoShow = false } = props
   const pageList = new Array(Math.ceil(count / 10)).fill(1)
 
   const onChange = (page) => {
@@ -17,7 +17,7 @@ const PaginationComponent = (props) => {
 
       <div className="pagination-seo">
         {
-          pageList.map((ele, index) => {
+          seoShow && pageList.map((ele, index) => {
             return (
               <Link href={`/?page=${index + 1}`} key={index}><a>{index + 1}</a></Link>
             )

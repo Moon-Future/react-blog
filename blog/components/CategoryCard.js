@@ -19,7 +19,6 @@ const CategoryCard = (props) => {
               <Link href={'/category?id=' + ele.id} key={ele.id}>
                 <a className="category-item">
                   <span>{ele.name}</span>
-                  <span>8</span>
                 </a>
               </Link>
             )
