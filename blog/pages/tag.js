@@ -76,7 +76,7 @@ const TagPage = (props) => {
         <TimelineList pageData={pageData} key="main" />
         <AsideCard tags={tags} categories={categories} recentArticle={recentArticle} key="aside" />
         {
-          id ? <Pagination count={count} current={current} onChangePage={onChangePage} key="pagination" /> : ''
+          id && count !== 0 ? <Pagination count={count} current={current} onChangePage={onChangePage} key="pagination" /> : ''
         }
       </Layout>
     </div>

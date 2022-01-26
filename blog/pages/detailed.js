@@ -1,4 +1,5 @@
 import Layout from '../components/Layout'
+import AsideCard from '../components/AsideCard'
 import marked from 'marked'
 import hljs from 'highlight.js'
 import '../static/style/pages/detailed.less'
@@ -48,6 +49,7 @@ const Detailed = (props) => {
             
         </div>
         <div className="markdown-content card-box" dangerouslySetInnerHTML={{ __html: html }} key="main"></div>
+        <AsideCard key="aside" />
       </Layout>
     </div>
   )

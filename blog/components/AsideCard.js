@@ -14,9 +14,9 @@ const RightCard = (props) => {
     <>
       <Author />
       <Project />
-      <RecentBlog recentArticle={recentArticle} />
-      <CategoryCard categories={categories} />
-      <TagCard tags={tags} />
+      { recentArticle && <RecentBlog recentArticle={recentArticle} /> }
+      { categories && <CategoryCard categories={categories} /> }
+      { tags && <TagCard tags={tags} /> }
     </>
   )
 }

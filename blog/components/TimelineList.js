@@ -8,6 +8,7 @@ import { formatTime } from '../util/index'
 const TimelineList = (props) => {
   const { title, type, typeName, typeList, articleList, count } = props.pageData
   const defaultCover = 'https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/cover-default_02.jpg'
+  console.log(props)
 
   const listBox = () => {
     return (
@@ -34,7 +35,7 @@ const TimelineList = (props) => {
       <Timeline>
         <Timeline.Item key="year">
           <p className="timeline-title">
-            {title} - {typeName ? `${typeName} - ` : ''}{count}
+            {title}{typeName ? ' - ' : ''}{`${typeName}(${count})`}
           </p>
         </Timeline.Item>
         {articleList.map((item, index) => {
