@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { RedoOutlined } from '@ant-design/icons'
-import { getPoetry, formatTime } from '../util/index'
+import { getPoetry, formatTime, MyIcon } from '../util'
 
 const PoetrySentence = (props) => {
   const [sentence, setSentence] = useState('')
@@ -91,7 +90,7 @@ const PoetrySentence = (props) => {
   return (
     <p className="poetry-sentence">
       {sentence}
-      {finished ? <RedoOutlined style={{ fontSize: '14px' }} onClick={() => refresh()} /> : null}
+      {finished ? <MyIcon type="icon-refresh" style={{ fontSize: '14px' }} onClick={() => refresh()} /> : null}
       <span style={{ visibility: finished ? 'hidden' : '' }}>|</span>
     </p>
   )

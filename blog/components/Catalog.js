@@ -1,5 +1,7 @@
-import { Anchor } from 'antd'
 import '../static/style/components/catalog.less'
+import { Anchor } from 'antd'
+import { MyIcon } from '../util'
+
 const { Link } = Anchor
 
 export default function Catalog(props) {
@@ -59,8 +61,11 @@ export default function Catalog(props) {
   }
 
   return (
-    <Anchor onClick={click}>
-      {render(items)}
-    </Anchor>
+    <div className="catalog-box card-box">
+      <h2><MyIcon type="icon-mulu" /> 目录</h2>
+      <Anchor onClick={click} affix={false} showInkInFixed>
+        {render(items)}
+      </Anchor>
+    </div>
   )
 }

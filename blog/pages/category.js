@@ -1,10 +1,10 @@
+import '../static/style/pages/index.less'
 import { useEffect, useState } from 'react'
+import axios from 'axios'
 import Layout from '../components/Layout'
 import AsideCard from '../components/AsideCard'
 import Pagination from '../components/Pagination'
 import TimelineList from '../components/TimelineList'
-import '../static/style/pages/index.less'
-import axios from 'axios'
 import { SSRAPI, API } from '../config/api'
 
 const CategoryPage = (props) => {
@@ -62,7 +62,7 @@ const CategoryPage = (props) => {
   }
 
   const getArticleList = async (page) => {
-    const result = await axios.post(API.getArticleData, { page: page })
+    const result = await axios.post(API.getArticleData, { page: page, categoryId: id })
     const dataList = formatData(result.data.articleList)
     setPageData({
       ...pageData,

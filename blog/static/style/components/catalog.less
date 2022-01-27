@@ -1,12 +1,17 @@
-.ant-anchor-wrapper {
-  height: calc(100vh - 150px) !important;
+@import '../variable.less';
+
+.catalog-box {
+  .ant-anchor-wrapper {
+    max-height: 70vh !important;
+    .scrollbar();
+  }
+  a {
+    color: @toc-link;
+  }
 }
 
-@media screen and (max-width: 992px) {
-  .ant-anchor-wrapper {
-    height: calc(100vh - 30px) !important;
-  }
-  .ant-drawer-body {
-    padding: 0 5px;
+.is-mobile {
+  .catalog-box {
+    display: none;
   }
 }

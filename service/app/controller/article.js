@@ -99,13 +99,42 @@ class ArticleController extends Controller {
   async getArticleData() {
     const { ctx, app } = this
     try {
-      const { page = 1 } = ctx.request.body
+      const { page = 1, categoryId, tagId } = ctx.request.body
       const pageSize = 10
       const tags = await app.mysql.select('tag')
       const categories = await app.mysql.select('category')
-      let articleList = await app.mysql.query(`SELECT * FROM article WHERE off != 1 ORDER BY add_time DESC LIMIT ?, ?`, [(page - 1) * pageSize, pageSize])
+      let articleList = []
+      if (categoryId) {
+        articleList = await app.mysql.query(`SELECT * FROM article WHERE off != 1 AND category LIKE '%${categoryId}%' ORDER BY add_time DESC LIMIT ?, ?`, [(page - 1) * pageSize, pageSize])
+      } else if (tagId) {
+        articleList = await app.mysql.query(`SELECT * FROM article WHERE off != 1 AND tag LIKE '%${tagId}%' ORDER BY add_time DESC LIMIT ?, ?`, [(page - 1) * pageSize, pageSize])
+      } else {
+        articleList = await app.mysql.query(`SELECT * FROM article WHERE off != 1 ORDER BY add_time DESC LIMIT ?, ?`, [(page - 1) * pageSize, pageSize])
+      }
       articleList = formatData(articleList, tags, categories)
       ctx.body = { articleList }
+    } catch (e) {
+      ctx.status = 400
+      ctx.body = { message: '/(ㄒoㄒ)/~~ 服务器开小差啦' }
+    }
+  }
+
+  // 文章详情页
+  async getArticleDetailed() {
+    const { ctx, app } = this
+    try {
+      const { id } = ctx.request.body
+      const tags = await app.mysql.select('tag')
+      const categories = await app.mysql.select('category')
+      let articleList = await app.mysql.query('SELECT * FROM article WHERE id = ?', [id])
+      articleList = formatData(articleList, tags, categories)
+      const articleDetail = articleList[0]
+      const recentArticle = await app.mysql.query(`SELECT * FROM article WHERE off != 1 ORDER BY add_time DESC LIMIT ?, ?`, [0, 5])
+
+      let mdContend = fs.readFileSync(path.join(filePath, articleDetail.title + '.md'), 'utf-8')
+      articleDetail.mdContent = formatContent(mdContend)
+
+      ctx.body = { articleDetail, recentArticle }
     } catch (e) {
       ctx.status = 400
       ctx.body = { message: '/(ㄒoㄒ)/~~ 服务器开小差啦' }

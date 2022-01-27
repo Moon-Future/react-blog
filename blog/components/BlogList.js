@@ -1,16 +1,14 @@
-import React from 'react'
+import '../static/style/components/blogList.less'
 import Link from 'next/link'
 import { List, Image } from 'antd'
-import '../static/style/components/blogList.less'
-import { CalendarFilled, FolderOpenFilled, TagFilled } from '@ant-design/icons'
-import { formatTime } from '../util/index'
+import { formatTime, MyIcon } from '../util'
 
 const BlogList = (props) => {
   const { articleList } = props
   const defaultCover = 'https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/cover-default_02.jpg'
 
   return (
-    <>
+    <div className="blog-list-container">
       <List
         itemLayout="vertical"
         dataSource={articleList}
@@ -27,13 +25,13 @@ const BlogList = (props) => {
               </Link>
               <div className="item-meta">
                 <span className="item-meta-wrapper">
-                  <CalendarFilled /> 发表于 {formatTime(item.add_time, 'yyyy-MM-dd hh:mm')}
+                  <MyIcon type="icon-calendar" /> 发表于 {formatTime(item.add_time, 'yyyy-MM-dd hh:mm')}
                 </span>
                 {
                   item.category && item.category.length ? (
                     <span className="item-meta-wrapper">
                       <span className="item-meta-separator">|</span>
-                      <FolderOpenFilled />
+                      <MyIcon type="icon-category" />
                       {item.category.map((ele) => (
                         <span className="item-meta-tag" key={ele.id}>
                           <Link href={'/category?id=' + item.id}>{ele.name}</Link>
@@ -46,7 +44,7 @@ const BlogList = (props) => {
                   item.tag && item.tag.length ? (
                     <span className="item-meta-wrapper">
                       <span className="item-meta-separator">|</span>
-                      <TagFilled />
+                      <MyIcon type="icon-tags" />
                       {item.tag.map((ele) => (
                         <span className="item-meta-tag" key={ele.id}>
                           <Link href={'/tag?id=' + item.id}>{ele.name}</Link>
@@ -61,7 +59,7 @@ const BlogList = (props) => {
           </List.Item>
         )}
       />
-    </>
+    </div>
   )
 }
 

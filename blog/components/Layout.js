@@ -1,17 +1,13 @@
+import '../static/style/components/layout.less'
 import Head from 'next/head'
 import Header from '../components/Header'
 import PoetrySentence from '../components/PoetrySentence'
 import ScrollTop from '../components/ScrollTop'
 import Footer from '../components/Footer'
-import '../static/style/components/layout.less'
-import { createFromIconfontCN } from '@ant-design/icons'
-
-const MyIcon = createFromIconfontCN({
-  scriptUrl: '//at.alicdn.com/t/font_2220107_frnkhisqosw.js', // 在 iconfont.cn 上生成
-})
+import { MyIcon } from '../util'
 
 const Layout = (props) => {
-  const { route, pageDesc, homeFlag } = props
+  const { route, pageDesc, homeFlag, catalogData } = props
   const children = Array.isArray(props.children) ? props.children : [props.children]
   const components = {}
   children.forEach((ele) => {
@@ -53,7 +49,7 @@ const Layout = (props) => {
         </div>
 
         <Footer />
-        <ScrollTop />
+        <ScrollTop catalogData={catalogData} />
       </div>
     </>
   )

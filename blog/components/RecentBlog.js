@@ -1,9 +1,7 @@
-import React from 'react'
 import '../static/style/components/recentBlog.less'
 import Link from 'next/link'
 import { List, Image } from 'antd'
-import { HistoryOutlined } from '@ant-design/icons'
-import { formatTime } from '../util/index'
+import { formatTime, MyIcon } from '../util'
 
 const RecentBlog = (props) => {
   const { recentArticle } = props
@@ -12,7 +10,7 @@ const RecentBlog = (props) => {
   return (
     <div className="recent-box card-box">
       <div className="card-headline">
-        <HistoryOutlined />
+        <MyIcon type="icon-recent" />
         <span className="card-title">最新文章</span>
       </div>
       <List

@@ -1,15 +1,16 @@
-import Layout from '../components/Layout'
-import AsideCard from '../components/AsideCard'
+import 'highlight.js/styles/monokai-sublime.css'
+import '../static/style/pages/detailed.less'
+import Link from 'next/link'
 import marked from 'marked'
 import hljs from 'highlight.js'
-import '../static/style/pages/detailed.less'
-import 'highlight.js/styles/monokai-sublime.css'
 import axios from 'axios'
+import Layout from '../components/Layout'
+import AsideCard from '../components/AsideCard'
 import { SSRAPI } from '../config/api'
+import { formatTime, MyIcon } from '../util'
 
 const Detailed = (props) => {
-  const { articleDetail } = props
-  const cover = articleDetail.cover
+  const { articleDetail, recentArticle } = props
   const renderer = new marked.Renderer()
   const catalogData = []
   let index = 0
@@ -42,14 +43,34 @@ const Detailed = (props) => {
   const html = marked(articleDetail.mdContent)
   
 
+  const cover = articleDetail.cover
   return (
     <div className="container detailed-container">
-      <Layout>
+      <Layout catalogData={catalogData}>
         <div className="detailed-cover" style={{ backgroundImage: `url(${cover})` }} key="top">
-            
+          <span className="detailed-title ellipsis-txt">{articleDetail.title}</span>
+          <div>
+            <span><MyIcon type="icon-calendar1" /> 发表于 {formatTime(articleDetail.add_time, 'yyyy-MM-dd hh:mm')}</span>
+            {
+              articleDetail.category && articleDetail.category.length ? (
+                <>
+                  <span className="detailed-meta-separator">|</span>
+                  <span>
+                    <MyIcon type="icon-category" />
+                    {articleDetail.category.map((ele) => (
+                      <span className="detailed-meta-tag" key={ele.id}>
+                        <Link href={'/category?id=' + articleDetail.id}>{ele.name}</Link>
+                      </span>
+                    ))}
+                  </span>
+                </>
+              ) : ''
+            }
+          </div>
+          <span><MyIcon type="icon-eye" /> 阅读量：{articleDetail.view}</span>
         </div>
         <div className="markdown-content card-box" dangerouslySetInnerHTML={{ __html: html }} key="main"></div>
-        <AsideCard key="aside" />
+        <AsideCard recentArticle={recentArticle} catalogData={catalogData} key="aside" />
       </Layout>
     </div>
   )
@@ -62,9 +83,10 @@ Detailed.getLayout = (page) => {
 export async function getServerSideProps(context) {
   try {
     const id = context.query.id
-    const result = await axios.post(SSRAPI.getArticle, { id })
+    const result = await axios.post(SSRAPI.getArticleDetailed, { id })
+    const data = result.data
     return {
-      props: { articleDetail: result.data }, // will be passed to the page component as props
+      props: { articleDetail: data.articleDetail, recentArticle: data.recentArticle }, // will be passed to the page component as props
     }
   } catch (e) {
     return {

@@ -15,3 +15,38 @@
 @gray: #f9f7f7;
 @blue: #00bbf0;
 @origin: #ff9f1c;
+
+@toc-link: #666261;
+
+
+@gray-1: #cacaca;
+@gray-2: #b9b8b8;
+
+.scrollbar {
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: @gray;
+    border-radius: 2px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: @gray-1;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: @gray-2;
+  }
+  // &::-webkit-scrollbar-corner {
+  //   background: #179a16;
+  // }
+}
+
+body.dark-theme {
+  @white: red;
+}
+
+[data-theme='dark'] {
+  @white: blue;
+}

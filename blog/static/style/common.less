@@ -15,24 +15,7 @@ body {
     sans-serif;
   line-height: 2;
   cursor: default;
-  &::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
-  }
-  &::-webkit-scrollbar-track {
-    background: @gray;
-    border-radius: 2px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: #49b1f5;
-    border-radius: 10px;
-  }
-  &::-webkit-scrollbar-thumb:hover {
-    background: #49b1f5;
-  }
-  &::-webkit-scrollbar-corner {
-    background: #179a16;
-  }
+  .scrollbar();
 }
 html {
   overflow-x: hidden;
@@ -93,64 +76,16 @@ a {
   -webkit-box-orient: vertical;
 }
 
-.comm-main {
-  margin-top: 100px;
-  min-height: calc(100vh - 500px);
-}
-.comm-left {
-  border-radius: 4px;
-  height: 100%;
-}
-.comm-center {
-  margin: 0 10px;
-  padding: 0 10px;
-}
-.comm-center-bg {
-  background: @gray;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  opacity: 0.9;
-}
-.comm-center-content {
-  position: relative;
-}
-.comm-right {
-  height: 100%;
-}
-.comm-box {
-  background-color: #fff;
-  padding: 0.3rem;
-  border-radius: 4px;
-  margin-bottom: 20px;
-}
-
-.ant-breadcrumb a {
-  color: @black;
-}
-.ant-breadcrumb-link a:hover {
-  color: @origin;
-}
-
-.scroll-progress {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 5px;
-  background: @red;
-  z-index: 100;
-  width: 50%;
-}
-
 .poetry-sentence {
   font-size: 2.5rem;
   color: @white;
   font-family: CandyHome, cursive, KaiTi, SimSun;
 }
+
 .sentence-wrap {
   position: absolute;
   top: -175px;
   right: 0;
 }
+
+

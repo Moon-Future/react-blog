@@ -6,9 +6,12 @@
 module.exports = (app) => {
   const { router, controller } = app
   const adminAuth = app.middleware.adminauth()
+  // 前端
   router.post('/api/getHomeData', controller.article.getHomeData)
   router.post('/api/getArticleData', controller.article.getArticleData)
+  router.post('/api/getArticleDetailed', controller.article.getArticleDetailed)
 
+  // 后台
   router.post('/api/getArticleList', controller.article.getArticleList)
   router.post('/api/getArticle', controller.article.getArticle)
   router.post('/api/addArticle', adminAuth, controller.article.addArticle)

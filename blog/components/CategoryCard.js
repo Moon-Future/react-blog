@@ -1,7 +1,6 @@
-import React from 'react'
 import '../static/style/components/categoryCard.less'
 import Link from 'next/link'
-import { FolderOpenFilled } from '@ant-design/icons'
+import { MyIcon } from '../util'
 
 const CategoryCard = (props) => {
   const { categories = [] } = props
@@ -9,7 +8,7 @@ const CategoryCard = (props) => {
   return (
     <div className="category-box card-box">
       <div className="card-headline">
-        <FolderOpenFilled />
+        <MyIcon type="icon-category" />
         <span className="card-title">分类</span>
       </div>
       <div className="category-list">

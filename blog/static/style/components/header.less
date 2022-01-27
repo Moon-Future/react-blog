@@ -42,6 +42,10 @@
     font-size: 1.2rem;
   }
 
+  .header-menu-mobile {
+    display: none;
+  }
+
   .header-menu {
     display: flex;
     font-size: 0.92rem;
@@ -51,8 +55,14 @@
       padding: 6px 0;
       font-weight: bold;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      font-size: 1rem;
       span {
         margin-right: 5px;
+        &.anticon {
+          font-size: 1.2rem;
+        }
       }
       &::after {
         position: absolute;
@@ -78,9 +88,15 @@
   }
 }
 
-
-// @media screen and (max-width: 992px) {
-//   .header {
-//     display: none;
-//   }
-// }
+.is-mobile {
+  .header {
+    .header-menu {
+      display: none;
+    }
+    .header-menu-mobile {
+      display: flex;
+      align-items: center;
+      font-size: 1.8rem;
+    }
+  }
+}

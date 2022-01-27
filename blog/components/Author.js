@@ -1,6 +1,6 @@
-import { Avatar, Divider, Popover, Image } from 'antd'
 import '../static/style/components/author.less'
-import { WechatFilled, GithubFilled } from '@ant-design/icons'
+import { Avatar, Divider, Popover, Image } from 'antd'
+import { MyIcon } from '../util'
 
 const Author = () => {
   return (
@@ -16,10 +16,10 @@ const Author = () => {
           }}
           trigger="hover"
         >
-          <Avatar className="author-social" size={32} icon={<WechatFilled />} className="account" />
+          <Avatar className="author-social" size={32} icon={<MyIcon type="icon-WeChat" />} className="account" />
         </Popover>
         <a href="https://github.com/Moon-Future/react-blog" target="_blank">
-          <Avatar className="author-social" size={32} icon={<GithubFilled />} className="account" />
+          <Avatar className="author-social" size={32} icon={<MyIcon type="icon-GitHub" />} className="account" />
         </a>
       </div>
     </div>

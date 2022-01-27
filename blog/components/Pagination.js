@@ -1,4 +1,3 @@
-import React from 'react'
 import '../static/style/components/pagination.less'
 import Link from 'next/link'
 import { Pagination } from 'antd'

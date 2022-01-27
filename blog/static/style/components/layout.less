@@ -7,13 +7,28 @@
   max-width: 1200px;
   width: 100%;
   display: flex;
+  .main-content {
+    width: 74%;
+    margin-bottom: 30px;
+  }
+  .aside-content {
+    width: 26%;
+    padding-left: 15px
+  }
 }
 
-.main-content {
-  width: 74%;
-}
 
-.aside-content {
-  width: 26%;
-  padding-left: 15px
+
+.is-mobile {
+  .main-container {
+    flex-direction: column;
+    padding: 20px 4px;
+    .main-content {
+      width: 100%;
+    }
+    .aside-content {
+      width: 100%;
+      padding-left: 0
+    }
+  }
 }

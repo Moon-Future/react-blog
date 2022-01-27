@@ -1,10 +1,9 @@
 import 'antd/dist/antd.css'
+import 'nprogress/nprogress.css'
 import '../static/style/common.less'
 import { AnimatePresence } from 'framer-motion'
 import NProgress from 'nprogress'
-import 'nprogress/nprogress.css'
 import Router from 'next/router'
-import Layout from '../components/Layout'
 
 NProgress.configure({
   minimum: 0.3,

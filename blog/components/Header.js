@@ -1,6 +1,6 @@
-import Link from 'next/link'
-import { HomeFilled, CalendarFilled, TagFilled, FolderOpenFilled, HeartFilled } from '@ant-design/icons'
 import '../static/style/components/header.less'
+import Link from 'next/link'
+import { MyIcon } from '../util'
 
 const Header = () => {
   return (
@@ -15,34 +15,37 @@ const Header = () => {
         <div className="header-menu">
           <Link href="/" >
             <a className="menu-item">
-              <HomeFilled />
+              <MyIcon type="icon-home" />
               <span>首页</span>
             </a>
           </Link>
           <Link href="/archive">
             <a className="menu-item">
-              <CalendarFilled />
+              <MyIcon type="icon-archive" />
               <span>文档</span>
             </a>
           </Link>
           <Link href="/tag">
             <a className="menu-item">
-              <TagFilled />
+              <MyIcon type="icon-tags" />
               <span>标签</span>
             </a>
           </Link>
           <Link href="/category">
             <a className="menu-item">
-              <FolderOpenFilled />
+              <MyIcon type="icon-category" />
               <span>分类</span>
             </a>
           </Link>
           <Link href="/about">
             <a className="menu-item">
-              <HeartFilled />
+              <MyIcon type="icon-like_fill" />
               <span>关于</span>
             </a>
           </Link>
+        </div>
+        <div className="header-menu-mobile">
+          <MyIcon type="icon-menu" />
         </div>
       </div>
     </div>

@@ -1,14 +1,11 @@
-import React from 'react'
 import '../static/style/components/timelineList.less'
 import Link from 'next/link'
-import { ClockCircleOutlined, CalendarOutlined } from '@ant-design/icons'
 import { Timeline, Image } from 'antd'
-import { formatTime } from '../util/index'
+import { formatTime, MyIcon } from '../util'
 
 const TimelineList = (props) => {
   const { title, type, typeName, typeList, articleList, count } = props.pageData
   const defaultCover = 'https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/cover-default_02.jpg'
-  console.log(props)
 
   const listBox = () => {
     return (
@@ -40,7 +37,7 @@ const TimelineList = (props) => {
         </Timeline.Item>
         {articleList.map((item, index) => {
           return (
-            <Timeline.Item dot={item.type === 'date' ? <ClockCircleOutlined className="timeline-clock-icon" /> : ''} color={item.type === 'date' ? 'green' : 'blue'} key={index}>
+            <Timeline.Item dot={item.type === 'date' ? <MyIcon type="icon-clock" className="timeline-clock-icon" /> : ''} color={item.type === 'date' ? 'green' : 'blue'} key={index}>
               {
                 item.type === 'date' ? <p className="timeline-year">{item.year}</p> : (
                   <div className="timeline-item">
@@ -50,7 +47,7 @@ const TimelineList = (props) => {
                       </Link>
                     </div>
                     <div className="timeline-info">
-                      <span className="timeline-date"><CalendarOutlined /> {formatTime(item.add_time, 'yyyy-MM-dd hh:mm')}</span>
+                      <span className="timeline-date"><MyIcon type="icon-calendar" /> {formatTime(item.add_time, 'yyyy-MM-dd hh:mm')}</span>
                       <Link href={'/detailed?id=' + item.id}>
                         <a className="ellipsis-txt timeline-link" title={item.title}>{item.title}</a>
                       </Link>

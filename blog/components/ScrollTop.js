@@ -1,42 +1,87 @@
+import '../static/style/components/scrollTop.less'
 import { useState, useEffect } from 'react'
 import { Anchor } from 'antd'
-import '../static/style/components/scrollTop.less'
-import { RocketTwoTone } from '@ant-design/icons'
+import Catalog from './Catalog'
+import { MyIcon, hasClassName, addClassName, removeClassName, debounce } from '../util'
 
 const { Link } = Anchor
 
-export default function ScrollTop() {
+export default function ScrollTop(props) {
   const [show, setShow] = useState(false)
-  const id = 'toTop-abcdefg'
+  const [otherShow, setOtherShow] = useState(false)
+  const [catalogShow, setCatalogShow] = useState(false)
+  const { catalogData } = props
+  const WIDTH = 992
 
   const click = (e) => {
     e.preventDefault()
   }
 
+  const handleClick = (type) => {
+    switch (type) {
+      case 'set':
+        setOtherShow(!otherShow)
+        break
+      case 'adjust':
+        hasClassName('dark-theme') ? removeClassName('dark-theme') : addClassName('dark-theme')
+        break
+      case 'catalog':
+        setCatalogShow(!catalogShow)
+        break
+    }
+  }
+
   const scrollListen = () => {
-    const height = document.documentElement.clientHeight
-    if (document.documentElement.scrollTop > height + 300) {
+    if (document.documentElement.scrollTop > 200) {
       setShow(true)
     } else {
       setShow(false)
     }
   }
 
+  const resize = () => {
+    const rect = document.body.getBoundingClientRect()
+    rect.width - 1 < WIDTH ? addClassName('is-mobile') : removeClassName('is-mobile')
+  }
+
+  const resizeListen = debounce(() => {
+    resize()
+  }, 100)
+
   useEffect(() => {
+    resize()
     window.addEventListener('scroll', scrollListen)
+    window.addEventListener('resize', resizeListen)
     return () => {
       window.removeEventListener('scroll', scrollListen)
+      window.addEventListener('resize', resizeListen)
     }
   }, [])
 
   return (
     <>
-      <span id={id} className="scroll-top-target"></span>
-      {show ? (
-        <Anchor onClick={click} className="scroll-top-anchor">
-          <Link className="scroll-top-icon" href={`#${id}`} title={<RocketTwoTone />}></Link>
-        </Anchor>
-      ) : null}
+      <span id="to-top-xxx" className="scroll-top-target"></span>
+      <div className={`mobile-catalog ${catalogShow ? 'mobile-catalog-show' : ''}`}>
+        { catalogData ? <Catalog catalogData={catalogData}></Catalog> : '' }
+      </div>
+      <div className={`setting-container ${show ? 'setting-container-show' : ''}`}>
+        <div className={`setting-wrap ${otherShow ? 'setting-wrap-show' : ''}`}>
+          {/* <div className="setting-item">{<MyIcon type="icon-read" />}</div> */}
+          {/* <div className="setting-item" onClick={() => handleClick('adjust')}>{<MyIcon type="icon-adjust" />}</div> */}
+          {/* <div className="setting-item">{<MyIcon type="icon-arrows-alt-h" />}</div> */}
+        </div>
+        {/* <div className="setting-item setting-set" onClick={() => handleClick('set')}>
+          {<MyIcon type="icon-setting" className="setting-set-icon" />}
+        </div> */}
+        <div className="setting-item setting-item-catalog" onClick={() => handleClick('catalog')}>
+          <MyIcon type="icon-i-catalog" />
+        </div>
+        <div className="setting-item">
+          <Anchor onClick={click} affix={false} showInkInFixed>
+            <Link href="#to-top-xxx" title={<MyIcon type="icon-huojian" />} />
+          </Anchor>
+        </div>
+      </div>
     </>
   )
 }

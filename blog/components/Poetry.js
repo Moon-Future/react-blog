@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react'
 import '../static/style/components/poetry.less'
 
 const Poetry = (props) => {
