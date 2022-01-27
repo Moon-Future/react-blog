@@ -20,7 +20,7 @@ const Layout = (props) => {
         <title>欢迎来到我的世界</title>
       </Head>
       <div className="layout-container">
-        <Header route={route} />
+        <Header />
 
         {
           components.top ? components.top : (
@@ -49,7 +49,7 @@ const Layout = (props) => {
         </div>
 
         <Footer />
-        <ScrollTop catalogData={catalogData} />
+        <ScrollTop catalogData={catalogData} route={route} />
       </div>
     </>
   )

@@ -10,7 +10,7 @@ import { SSRAPI } from '../config/api'
 import { formatTime, MyIcon } from '../util'
 
 const Detailed = (props) => {
-  const { articleDetail, recentArticle } = props
+  const { articleDetail, recentArticle, route } = props
   const renderer = new marked.Renderer()
   const catalogData = []
   let index = 0
@@ -46,7 +46,7 @@ const Detailed = (props) => {
   const cover = articleDetail.cover
   return (
     <div className="container detailed-container">
-      <Layout catalogData={catalogData}>
+      <Layout catalogData={catalogData} route={route}>
         <div className="detailed-cover" style={{ backgroundImage: `url(${cover})` }} key="top">
           <span className="detailed-title ellipsis-txt">{articleDetail.title}</span>
           <div>
