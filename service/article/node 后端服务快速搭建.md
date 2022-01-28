@@ -1,3 +1,18 @@
+---
+title: node 后端服务快速搭建
+date: 2019-07-27 16:57:47
+description: 快速搭建node后端服务
+基于Koa2、Express、Mysql、Mongodb快速搭建Node后端服务，实现前后端通讯。
+目的
+为不同 vue 项目快速搭建 node 后端服务，去除重复性工作；为刚入门的同行提供一个清晰的 node 服务搭建流程与模板
+categories: 
+  - 前端
+tags: 
+  - Node
+cover: https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/cover-node_server.jpg
+top_img: https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/top-node_server.jpg
+---
+
 # 快速搭建node后端服务
 
     基于Koa2、Express、Mysql、Mongodb快速搭建Node后端服务，实现前后端通讯。

@@ -158,5 +158,5 @@ export const debounce = (func, wait, immediate) => {
 
 import { createFromIconfontCN } from '@ant-design/icons'
 export const MyIcon = createFromIconfontCN({
-  scriptUrl: '//at.alicdn.com/t/font_2220107_m0hciglnvh.js', // 在 iconfont.cn 上生成
+  scriptUrl: '//at.alicdn.com/t/font_2220107_csd0517m51o.js', // 在 iconfont.cn 上生成
 })

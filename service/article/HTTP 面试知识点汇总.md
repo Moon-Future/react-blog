@@ -1,3 +1,24 @@
+---
+title: HTTP 面试知识点汇总
+date: 2020-05-07 17:03:52
+description: ## 1、什么是 HTTP 协议？有什么特点？
+
+HTTP 协议是超文本传输协议的缩写，英文是 Hyper Text Transfer Protocol。它是从 WEB 服务器传输超文本标记语言（HTML）到本地浏览器的传送协议。
+
+特点：
+
+- **简单快速**：客户向服务器请求服务时，只需传送请求方法和路径
+- **灵活**：HTTP 允许传输任意类型的数据对象。传输的类型由 Content-Type 加以标记
+- **无连接**：限制每次连接只处理一个请求。服务器处理完客户的请求，并收到客户的应答后，即断开连接。采用这种方式可以节省传输时间，但是却不利于客户端与服务器保持会话连接，为了弥补这种不足，产生了两项记录 HTTP 状态的技术，一个叫做 Cookie，一个叫做 Session。
+- **无状态**：是指协议对于事务处理没有记忆能力，服务器不知道客户端是什么状态，每次 HTTP 请求都是独立的，任何两个请求之间没有什么必然的联系。
+categories: 
+  - 前端
+tags: 
+  - HTTP
+cover: https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/cover-HTTP.jpg
+top_img: https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/top-HTTP.jpg
+---
+
 ## 1、什么是 HTTP 协议？有什么特点？
 
 HTTP 协议是超文本传输协议的缩写，英文是 Hyper Text Transfer Protocol。它是从 WEB 服务器传输超文本标记语言（HTML）到本地浏览器的传送协议。

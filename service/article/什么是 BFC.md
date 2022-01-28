@@ -1,3 +1,15 @@
+---
+title: 什么是 BFC
+date: 2020-04-19 17:02:24
+description: BFC，全名是 Block Formatting Context，称为块级格式化上下文，是 CSS 中的一种渲染机制。是一个拥有独立渲染区域的盒子(也可以理解为结界)，规定了内部元素如何布局，并且盒子内部元素与外部元素互不影响。
+categories: 
+  - 前端
+tags: 
+  - CSS
+cover: https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/cover-BFC.jpg
+top_img: https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/top-BFC.jpg
+---
+
 ## 什么是 BFC ？
 
 BFC，全名是 Block Formatting Context，称为块级格式化上下文，是 CSS 中的一种渲染机制。是一个拥有独立渲染区域的盒子(也可以理解为结界)，规定了内部元素如何布局，并且盒子内部元素与外部元素互不影响。

@@ -41,11 +41,15 @@ export default function ScrollTop(props) {
   }
 
   const fontSizeAuto = (oriWidth) => {
-    return function(){
-      var viewportWidth = document.documentElement.clientWidth;
-      if(viewportWidth > oriWidth){ viewportWidth = oriWidth; }
-      if(viewportWidth < 320){ viewportWidth = 320; }
-      document.documentElement.style.fontSize = viewportWidth/oriWidth*100 +'px';	
+    return function () {
+      let viewportWidth = document.documentElement.clientWidth
+      if (viewportWidth > oriWidth) {
+        viewportWidth = oriWidth
+      }
+      if (viewportWidth < 320) {
+        viewportWidth = 320
+      }
+      document.documentElement.style.fontSize = (viewportWidth / oriWidth) * 100 + 'px'
     }
   }
 
@@ -75,7 +79,7 @@ export default function ScrollTop(props) {
     <>
       <span id="to-top-xxx" className="scroll-top-target"></span>
       <div className={`mobile-catalog ${catalogShow ? 'mobile-catalog-show' : ''}`}>
-        { catalogData ? <Catalog catalogData={catalogData}></Catalog> : '' }
+        {catalogData ? <Catalog catalogData={catalogData}></Catalog> : ''}
       </div>
       <div className={`setting-container ${show ? 'setting-container-show' : ''}`}>
         {/* <div className={`setting-wrap ${otherShow ? 'setting-wrap-show' : ''}`}>
@@ -86,11 +90,13 @@ export default function ScrollTop(props) {
         <div className="setting-item setting-set" onClick={() => handleClick('set')}>
           {<MyIcon type="icon-setting" className="setting-set-icon" />}
         </div> */}
-        { catalogBtnShow ? (
+        {catalogBtnShow ? (
           <div className="setting-item setting-item-catalog" onClick={() => handleClick('catalog')}>
             <MyIcon type="icon-i-catalog" />
           </div>
-        ) : '' }
+        ) : (
+          ''
+        )}
         <div className="setting-item">
           <Anchor onClick={click} affix={false} showInkInFixed>
             <Link href="#to-top-xxx" title={<MyIcon type="icon-huojian" />} />

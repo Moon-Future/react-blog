@@ -43,7 +43,7 @@ const Detailed = (props) => {
   const html = marked(articleDetail.mdContent)
   
 
-  const cover = articleDetail.cover
+  const cover = articleDetail.topImg || articleDetail.cover
   return (
     <div className="container detailed-container">
       <Layout catalogData={catalogData} route={route}>

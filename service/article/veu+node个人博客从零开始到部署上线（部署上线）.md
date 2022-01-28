@@ -1,3 +1,15 @@
+---
+title: veu+node个人博客从零开始到部署上线（部署上线）
+date: 2018-11-20 08:00:33
+description: Vue 博客部署
+categories: 
+  - 前端
+tags: 
+  - Vue
+cover: https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/cover-vue_blog_02.jpg
+top_img: https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/top-vue_blog_02.jpg
+---
+
 # 云服务器
 
 ## 阿里云 or 腾讯云

@@ -14,6 +14,14 @@ const Layout = (props) => {
     components[ele.key] = ele
   })
 
+  const scrollDown = () => {
+    const viewportHeight = document.documentElement.clientHeight
+    window.scrollTo({
+      top: viewportHeight,
+      behavior: 'smooth',
+    })
+  }
+
   return (
     <>
       <Head>
@@ -22,23 +30,21 @@ const Layout = (props) => {
       <div className="layout-container">
         <Header />
 
-        {
-          components.top ? components.top : (
-            <div className="page-background" style={{height: homeFlag ? '100vh' : '400px'}}>
+        {components.top ? (
+          components.top
+        ) : (
+          <div className="page-background" style={{ height: homeFlag ? '100vh' : '400px' }}>
             <div className="page-content">
-              <span className="blog-desc">{ pageDesc || '沉淀酝酿，厚积薄发' }</span>
+              <span className="blog-desc">{pageDesc || '沉淀酝酿，厚积薄发'}</span>
               {homeFlag && <PoetrySentence />}
             </div>
-            {
-              homeFlag && (
-                <div className="scroll-down">
-                  <MyIcon type="icon-scroll-down" />
-                </div>
-              )
-            }
+            {homeFlag && (
+              <div className="scroll-down">
+                <MyIcon type="icon-scroll-down" onClick={scrollDown} />
+              </div>
+            )}
           </div>
-          )
-        }
+        )}
 
         <div className="main-container">
           <div className="main-content">

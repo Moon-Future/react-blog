@@ -1,3 +1,17 @@
+---
+title: vue + koa2 实现 session、token 登陆状态验证
+date: 2019-08-22 17:00:28
+description: 1、Session 登陆是在服务器端生成用户相关 session 数据，发给客户端 session_id 存放到 cookie 中，这样在客户端请求时带上 session_id 就可以验证服务器端是否存在 session 数据，以此完成用户认证。这种认证方式，可以更好的在服务端对会话进行控制，安全性比较高(session_id 随机），但是服务端需要存储 session 数据(如内存或数据库），这样无疑增加维护成本和减弱可扩展性(多台服务器)。 CSRF 攻击一般基于 cookie。另外，如果是原生 app 使用这种服务接口，因为没有浏览器 cookie 功能，所以接入会相对麻烦。
+2、基于 token 的用户认证是一种服务端无状态的认证方式，服务端不用存放 token 数据。用户验证后,服务端生成一个 token(hash 或 encrypt)发给客户端，客户端可以放到 cookie 或 localStorage 中，每次请求时在 Header 中带上 token，服务端收到 token，通过验证后即可确认用户身份。这种方式相对 cookie 的认证方式就简单一些，服务端不用存储认证数据，易维护扩展性强，token 存在 localStorage 可避免 CSRF，web 和 app 应用都比较简单。不过这种方式在加密或解密的时候会有一些性能开销(好像也不是很大)，有些对称加密存在安全隐患(aes cbc 字节翻转攻击)。
+categories: 
+  - 前端
+tags: 
+  - Vue
+  - Node
+cover: https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/cover-session_token.jpg
+top_img: https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/top-session_token.jpg
+---
+
 # Session 登陆与 Token 登陆的区别
 
 1、Session 登陆是在服务器端生成用户相关 session 数据，发给客户端 session_id 存放到 cookie 中，这样在客户端请求时带上 session_id 就可以验证服务器端是否存在 session 数据，以此完成用户认证。这种认证方式，可以更好的在服务端对会话进行控制，安全性比较高(session_id 随机），但是服务端需要存储 session 数据(如内存或数据库），这样无疑增加维护成本和减弱可扩展性(多台服务器)。 CSRF 攻击一般基于 cookie。另外，如果是原生 app 使用这种服务接口，因为没有浏览器 cookie 功能，所以接入会相对麻烦。  

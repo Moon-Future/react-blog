@@ -1,3 +1,15 @@
+---
+title: veu+node个人博客从零开始到部署上线（从零开始）
+date: 2018-11-20 08:00:21
+description: veu+node个人博客从零开始，本篇主要讲 Vue 如何和后端进行交互获取数据
+categories: 
+  - 前端
+tags: 
+  - Vue
+cover: https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/cover-vue_blog_01.jpg
+top_img: https://static-1255423800.cos.ap-guangzhou.myqcloud.com/image/blog/top-vue_blog_01.jpg
+---
+
 博客第一篇，第一版，vue+node+mysql搭建个人博客，后mysql数据库更换为mongodb，页面布局样式重新设计。
 
 
@@ -379,101 +391,7 @@ proxyTable: {
     app.listen(3000);
     console.log('success listen at port:3000......');
   
-    ----------------------------------------------
-  
-    // congif/index.js
-    proxyTable: {
-      '/add': {
-        target: 'http://localhost:3000/add',
-        changeOrigin: true,
-        pathRewrite: {
-            '^/add': ''
-          }
-      },
-      '/del': {
-        target: 'http://localhost:3000/del',
-        changeOrigin: true,
-        pathRewrite: {
-            '^/del': ''
-          }
-      },
-    },
-    ```
-
-7、正确返回数据
-![](http://qiniu.cdn.cl8023.com/%E5%90%8E%E5%8F%B0%E8%BF%94%E5%9B%9E%E7%BB%93%E6%9E%9C.jpg)
-
-
-# 数据库存取数据（Mysql）
-
-    Mysql可视化工具我用的是Navicat For Mysql，新建连接，数据库，数据表，查询等都可在其中完成，当然熟悉命令的都可以在cmd中命令完成 
-
-### Mysql 新建连接
-
-![新建数据库](http://qiniu.cdn.cl8023.com/%E6%96%B0%E5%BB%BA%E6%95%B0%E6%8D%AE%E5%BA%93Mysql.jpg)
-
-### 连接数据库
-
-在 src/server 下新建文件 db.js，写入下面代码
-
-```js
-const mysql = require('mysql');
-
-const mysqlConfig = {
-  host: 'localhost',  // 新建数据库连接时的 主机名或ID地址 内容
-  user: 'root', 
-  password: '8023', // root 密码
-  database: 'myBlog', // 数据库名
-  port: '3306'
-}
-const pool = mysql.createPool({
-  host: mysqlConfig.host,
-  user: mysqlConfig.user,
-  password: mysqlConfig.password,
-  database: mysqlConfig.database,
-  port: mysqlConfig.port,
-  multipleStatements: true    // 多语句查询
-});
-
-var setValue = function() {
-  pool.getConnection((err, connection) => {
-    var sql = 'INSERT INTO test(id, name) VALUES (1, "blog")'
-    connection.query(sql, (err, result) => {
-        console.log(result);
-        connection.release();
-    })
-  })
-}
-
-setValue();
-```
-
-引入包 mysql，创建连接池 mysql.createPool，sql语法和在命令中使用的形同，拼成字符串即可，在 server 目录下运行 db.js 文件，刷新数据库
-
-![添加数据](http://qiniu.cdn.cl8023.com/dbSetValue.jpg)
-
-如果这一步出现问题
-
-```cmd
-throw err: // Rethrow non-Mysql errors
-TypeError: Cannot read property 'query' of undefined
-```
-
-说明没连接上数据库，在确认数据库user、password无误的情况下，导致这个错误的原因是，目前，
-最新的mysql模块并未完全支持MySQL 8的“caching_sha2_password”加密方式，而“caching_sha2_password”在MySQL 8中是默认的加密方式。 
-
-**解决方法**是重新修改用户root的密码，并指定mysql模块能够支持的加密方式：
-
-```cmd
-mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '123456';
-Query OK, 0 rows affected (0.12 sec)
-```
-
-同理可增删查改数据
-
-```js
-// 查询数据，？ 的值填入 connection.jquery 的第二个参数（数组）中
-// WHERE id = ? AND name = ? ---> connetion.query(sql, [1, "blog"], () => )
+    > connetion.query(sql, [1, "blog"], () => )
 var getValue = function() {
   pool.getConnection((err, connection) => {
     var sql = 'SELECT * FROM test WHERE id = ?'
