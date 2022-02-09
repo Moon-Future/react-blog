@@ -39,7 +39,7 @@ top_img: ${topImg}
 }
 
 function formatContent(content) {
-  return content.replace(/---(.*?)---/sg, '').trim()
+  return content.replace(/---(.*?)---/s, '').trim()
 }
 
 function formatData(data, tags, categories) {
