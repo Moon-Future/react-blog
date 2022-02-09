@@ -67,12 +67,12 @@ const Header = () => {
               <span>分类</span>
             </a>
           </Link>
-          <Link href="/about">
+          {/* <Link href="/about">
             <a className="menu-item">
               <MyIcon type="icon-like_fill" />
               <span>关于</span>
             </a>
-          </Link>
+          </Link> */}
         </div>
         <div className="header-menu-icon" onClick={clickMenuIcon}>
           <MyIcon type="icon-menu" />
@@ -105,12 +105,12 @@ const Header = () => {
                 <span>分类</span>
               </a>
             </Link>
-            <Link href="/about">
+            {/* <Link href="/about">
               <a className="menu-item" onClick={clickMenu}>
                 <MyIcon type="icon-like_fill" />
                 <span>关于</span>
               </a>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

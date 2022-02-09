@@ -37,6 +37,7 @@ export default function ScrollTop(props) {
       setShow(true)
     } else {
       setShow(false)
+      setCatalogShow(false)
     }
   }
 
