@@ -130,6 +130,7 @@ class ArticleController extends Controller {
       articleList = formatData(articleList, tags, categories)
       const articleDetail = articleList[0]
       const recentArticle = await app.mysql.query(`SELECT * FROM article WHERE off != 1 ORDER BY add_time DESC LIMIT ?, ?`, [0, 5])
+      await app.mysql.update('article', { id: articleDetail.id, view: articleDetail.view + 1 })
 
       let mdContend = fs.readFileSync(path.join(filePath, articleDetail.title + '.md'), 'utf-8')
       articleDetail.mdContent = formatContent(mdContend)

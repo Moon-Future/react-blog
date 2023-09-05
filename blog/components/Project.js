@@ -5,10 +5,10 @@ const Project = () => {
   return (
     <div className="project-box card-box">
       <div className="project-item">
-        <Image src="../static/images/project-01.png" width={100} preview={false} />
+        <Image src="https://love100-1255423800.cos.ap-shanghai.myqcloud.com/images/barcode/love100_barcode.jpg" width={100} preview={false} />
         <div className="project-txt">
-          <p className="project-title">垃圾分类小程序</p>
-          <p className="project-desc">快来看看你是什么垃圾吧~</p>
+          <p className="project-title">情侣100件事</p>
+          <p className="project-desc">浪漫小事打卡~</p>
         </div> 
       </div>
     </div>
