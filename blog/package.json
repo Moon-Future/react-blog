@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev -p 9000",
     "build": "next build",
-    "start": "next start -p 9000"
+    "start": "next start -p 9000",
+    "pm2start": "pm2 start npm --name react_blog -- start",
+    "pm2stop": "pm2 stop react_blog"
   },
   "dependencies": {
     "@zeit/next-css": "^1.0.1",

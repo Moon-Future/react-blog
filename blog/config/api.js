@@ -2,12 +2,11 @@ import getConfig from 'next/config'
 const { publicRuntimeConfig } = getConfig()
 
 const SSRHOST = `http://${publicRuntimeConfig.HOST}:9002`
-const HOST = `http://localhost:9002`
+const HOST = process.env.NODE_ENV === 'production' ? 'http://120.27.159.134:9002' : `http://localhost:9002`
 
 export const SSRAPI = {
   getHomeData: SSRHOST + '/api/getHomeData',
   getArticleDetailed: SSRHOST + '/api/getArticleDetailed',
-
 
   getArticleList: SSRHOST + '/api/getArticleList',
   getArticle: SSRHOST + '/api/getArticle',

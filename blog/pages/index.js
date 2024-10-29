@@ -1,4 +1,3 @@
-
 import '../static/style/pages/index.less'
 import { useState } from 'react'
 import axios from 'axios'
@@ -7,6 +6,8 @@ import AsideCard from '../components/AsideCard'
 import Pagination from '../components/Pagination'
 import BlogList from '../components/BlogList'
 import { SSRAPI, API } from '../config/api'
+
+const pageSize = 10
 
 const Home = (props) => {
   const { tags, categories, count, recentArticle } = props
@@ -19,7 +20,7 @@ const Home = (props) => {
   }
 
   const getArticleList = async (page) => {
-    const result = await axios.post(API.getArticleData, { page: page })
+    const result = await axios.post(API.getArticleData, { page: page, pageSize })
     setArticleList(result.data.articleList)
   }
 
@@ -28,7 +29,7 @@ const Home = (props) => {
       <Layout homeFlag={true}>
         <BlogList articleList={articleList} key="main" />
         <AsideCard tags={tags} categories={categories} recentArticle={recentArticle} key="aside" />
-        <Pagination count={count} current={current} onChangePage={onChangePage} seoShow key="pagination" />
+        <Pagination count={count} current={current} pageSize={pageSize} onChangePage={onChangePage} seoShow key="pagination" />
       </Layout>
     </div>
   )
@@ -43,16 +44,16 @@ export async function getServerSideProps(context) {
     const page = context.query.page ? Number(context.query.page) : 1
     if (isNaN(page)) {
       return {
-        props: { articleList: [], tags: [], categories: [], count: 0, current: 1, recentArticle: [] }
+        props: { articleList: [], tags: [], categories: [], count: 0, current: 1, recentArticle: [] },
       }
     }
-    const result = await axios.post(SSRAPI.getHomeData, { page })
+    const result = await axios.post(SSRAPI.getHomeData, { page, pageSize })
     return {
       props: { ...result.data, current: page }, // will be passed to the page component as props
     }
   } catch (e) {
     return {
-      props: { articleList: [], tags: [], categories: [], count: 0, current: 1, recentArticle: [] } // will be passed to the page component as props
+      props: { articleList: [], tags: [], categories: [], count: 0, current: 1, recentArticle: [] }, // will be passed to the page component as props
     }
   }
 }

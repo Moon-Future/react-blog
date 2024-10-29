@@ -28,8 +28,7 @@
   },
   "scripts": {
     "start": "egg-scripts start --daemon --title=egg-server-react_blog_service --node-options--max-old-space-size=100",
-    "start-back": "egg-scripts start --daemon --title=egg-server-react_blog_service --node-options--max-old-space-size=100",
-    "stop": "egg-scripts stop --title=egg-server-react_blog_service",
+    "stop-back": "egg-scripts stop --title=egg-server-react_blog_service",
     "dev": "egg-bin dev",
     "debug": "egg-bin debug",
     "test": "npm run lint -- --fix && npm run test-local",
@@ -37,7 +36,9 @@
     "cov": "egg-bin cov",
     "lint": "eslint .",
     "ci": "npm run lint && npm run cov",
-    "autod": "autod"
+    "autod": "autod",
+    "pm2start": "pm2 start server.js --name react_blog_service",
+    "pm2stop": "pm2 stop react_blog_service"
   },
   "ci": {
     "version": "10"

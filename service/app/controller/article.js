@@ -16,14 +16,13 @@ function writeContent(params) {
   const { title, content, summary, coverImg, topImg, backgroundImg, tagsName, categoriesName, addTime, updTime } = params
   let categoryStr = ''
   let tagStr = ''
-  categoriesName.forEach(ele => {
+  categoriesName.forEach((ele) => {
     categoryStr += `\n  - ${ele}`
   })
-  tagsName.forEach(ele => {
+  tagsName.forEach((ele) => {
     tagStr += `\n  - ${ele}`
   })
-  const frontMatter =
-`---
+  const frontMatter = `---
 title: ${title}
 date: ${formatTime(addTime || Date.now(), 'yyyy-MM-dd hh:mm:sss')}
 description: ${summary}
@@ -69,8 +68,7 @@ class ArticleController extends Controller {
   async getHomeData() {
     const { ctx, app } = this
     try {
-      const { page = 1, categoryId, tagId } = ctx.request.body
-      const pageSize = 10
+      const { page = 1, categoryId, tagId, pageSize = 10 } = ctx.request.body
       const tags = await app.mysql.select('tag')
       const categories = await app.mysql.select('category')
       const recentArticle = await app.mysql.query(`SELECT * FROM article WHERE off != 1 ORDER BY add_time DESC LIMIT ?, ?`, [0, 5])
@@ -78,13 +76,22 @@ class ArticleController extends Controller {
       let articleList = []
       if (categoryId) {
         count = await app.mysql.query(`SELECT COUNT(*) as count FROM article WHERE off != 1 AND category LIKE '%${categoryId}%'`)
-        articleList = await app.mysql.query(`SELECT * FROM article WHERE off != 1 AND category LIKE '%${categoryId}%' ORDER BY add_time DESC LIMIT ?, ?`, [(page - 1) * pageSize, pageSize])
+        articleList = await app.mysql.query(
+          `SELECT * FROM article WHERE off != 1 AND category LIKE '%${categoryId}%' ORDER BY add_time DESC LIMIT ?, ?`,
+          [(page - 1) * pageSize, pageSize]
+        )
       } else if (tagId) {
         count = await app.mysql.query(`SELECT COUNT(*) as count FROM article WHERE off != 1 AND tag LIKE '%${tagId}%'`)
-        articleList = await app.mysql.query(`SELECT * FROM article WHERE off != 1 AND tag LIKE '%${tagId}%' ORDER BY add_time DESC LIMIT ?, ?`, [(page - 1) * pageSize, pageSize])
+        articleList = await app.mysql.query(`SELECT * FROM article WHERE off != 1 AND tag LIKE '%${tagId}%' ORDER BY add_time DESC LIMIT ?, ?`, [
+          (page - 1) * pageSize,
+          pageSize,
+        ])
       } else {
         count = await app.mysql.query(`SELECT COUNT(*) as count FROM article WHERE off != 1`)
-        articleList = await app.mysql.query(`SELECT * FROM article WHERE off != 1 ORDER BY add_time DESC LIMIT ?, ?`, [(page - 1) * pageSize, pageSize])
+        articleList = await app.mysql.query(`SELECT * FROM article WHERE off != 1 ORDER BY add_time DESC LIMIT ?, ?`, [
+          (page - 1) * pageSize,
+          pageSize,
+        ])
       }
       articleList = formatData(articleList, tags, categories)
       ctx.body = { articleList, tags, categories, count: count[0].count, recentArticle }
@@ -99,17 +106,25 @@ class ArticleController extends Controller {
   async getArticleData() {
     const { ctx, app } = this
     try {
-      const { page = 1, categoryId, tagId } = ctx.request.body
-      const pageSize = 10
+      const { page = 1, categoryId, tagId, pageSize = 10 } = ctx.request.body
       const tags = await app.mysql.select('tag')
       const categories = await app.mysql.select('category')
       let articleList = []
       if (categoryId) {
-        articleList = await app.mysql.query(`SELECT * FROM article WHERE off != 1 AND category LIKE '%${categoryId}%' ORDER BY add_time DESC LIMIT ?, ?`, [(page - 1) * pageSize, pageSize])
+        articleList = await app.mysql.query(
+          `SELECT * FROM article WHERE off != 1 AND category LIKE '%${categoryId}%' ORDER BY add_time DESC LIMIT ?, ?`,
+          [(page - 1) * pageSize, pageSize]
+        )
       } else if (tagId) {
-        articleList = await app.mysql.query(`SELECT * FROM article WHERE off != 1 AND tag LIKE '%${tagId}%' ORDER BY add_time DESC LIMIT ?, ?`, [(page - 1) * pageSize, pageSize])
+        articleList = await app.mysql.query(`SELECT * FROM article WHERE off != 1 AND tag LIKE '%${tagId}%' ORDER BY add_time DESC LIMIT ?, ?`, [
+          (page - 1) * pageSize,
+          pageSize,
+        ])
       } else {
-        articleList = await app.mysql.query(`SELECT * FROM article WHERE off != 1 ORDER BY add_time DESC LIMIT ?, ?`, [(page - 1) * pageSize, pageSize])
+        articleList = await app.mysql.query(`SELECT * FROM article WHERE off != 1 ORDER BY add_time DESC LIMIT ?, ?`, [
+          (page - 1) * pageSize,
+          pageSize,
+        ])
       }
       articleList = formatData(articleList, tags, categories)
       ctx.body = { articleList }
@@ -142,12 +157,13 @@ class ArticleController extends Controller {
     }
   }
 
-
   // 获取文章列表
   async getArticleList() {
     const { ctx, app } = this
     try {
-      const result = await app.mysql.query('SELECT a.*, b.username, b.nickname FROM article as a, user as b WHERE a.off != 1 AND a.user_id = b.id ORDER BY a.add_time DESC')
+      const result = await app.mysql.query(
+        'SELECT a.*, b.username, b.nickname FROM article as a, user as b WHERE a.off != 1 AND a.user_id = b.id ORDER BY a.add_time DESC'
+      )
       const tagAll = await app.mysql.select('tag')
       const categoryAll = await app.mysql.select('category')
       result.forEach((item) => {
@@ -178,7 +194,9 @@ class ArticleController extends Controller {
   async getArticle() {
     // edit 是否获取全部标签，新增文章时需要全部和已选
     const { id, edit } = this.ctx.request.body
-    const result = (await this.app.mysql.query('SELECT a.*, b.username, b.nickname FROM article as a, user as b WHERE a.id = ? AND a.user_id = b.id', [id]))[0]
+    const result = (
+      await this.app.mysql.query('SELECT a.*, b.username, b.nickname FROM article as a, user as b WHERE a.id = ? AND a.user_id = b.id', [id])
+    )[0]
     if (result) {
       // 新增阅读量
       edit ? null : await this.app.mysql.update('article', { id: id, view: result.view + 1 })
@@ -311,7 +329,7 @@ class ArticleController extends Controller {
     try {
       const { id } = ctx.request.body
       const userInfo = ctx.userInfo
-      const article = await conn.get('article', { id: id }) 
+      const article = await conn.get('article', { id: id })
       if (userInfo.id != article.user_id && !userInfo.root) {
         ctx.status = 403
         ctx.body = { message: '没有权限' }

@@ -7,6 +7,8 @@ import Pagination from '../components/Pagination'
 import TimelineList from '../components/TimelineList'
 import { SSRAPI, API } from '../config/api'
 
+const pageSize = 10
+
 const ArchivePage = (props) => {
   const { articleList, tags, categories, count, recentArticle } = props
   const [current, setCurrent] = useState(props.current)
@@ -16,7 +18,7 @@ const ArchivePage = (props) => {
     typeName: '',
     typeList: tags,
     count,
-    articleList
+    articleList,
   })
 
   useEffect(() => {
@@ -24,7 +26,7 @@ const ArchivePage = (props) => {
     setPageData({
       ...pageData,
       count,
-      articleList: dataList
+      articleList: dataList,
     })
   }, [])
 
@@ -32,7 +34,7 @@ const ArchivePage = (props) => {
     const keys = []
     const dataMap = {}
     const articleList = []
-    data.forEach(ele => {
+    data.forEach((ele) => {
       const date = new Date(ele.add_time)
       const year = date.getFullYear()
       if (dataMap[year]) {
@@ -45,8 +47,8 @@ const ArchivePage = (props) => {
     keys.sort((a, b) => {
       return b - a
     })
-    keys.forEach(ele => {
-      articleList.push({type: 'date', year: ele}, ...dataMap[ele])
+    keys.forEach((ele) => {
+      articleList.push({ type: 'date', year: ele }, ...dataMap[ele])
     })
     return articleList
   }
@@ -57,11 +59,11 @@ const ArchivePage = (props) => {
   }
 
   const getArticleList = async (page) => {
-    const result = await axios.post(API.getArticleData, { page: page })
+    const result = await axios.post(API.getArticleData, { page: page, pageSize })
     const dataList = formatData(result.data.articleList)
     setPageData({
       ...pageData,
-      articleList: dataList
+      articleList: dataList,
     })
   }
 
@@ -70,7 +72,7 @@ const ArchivePage = (props) => {
       <Layout pageDesc="文档">
         <TimelineList pageData={pageData} key="main" />
         <AsideCard tags={tags} categories={categories} recentArticle={recentArticle} key="aside" />
-        <Pagination count={count} current={current} onChangePage={onChangePage} key="pagination" />
+        <Pagination count={count} current={current} pageSize={pageSize} onChangePage={onChangePage} key="pagination" />
       </Layout>
     </div>
   )
@@ -83,13 +85,13 @@ ArchivePage.getLayout = (page) => {
 export async function getServerSideProps(context) {
   try {
     const page = 1
-    const result = await axios.post(SSRAPI.getHomeData, { page })
+    const result = await axios.post(SSRAPI.getHomeData, { page, pageSize })
     return {
       props: { ...result.data, current: page }, // will be passed to the page component as props
     }
   } catch (e) {
     return {
-      props: { articleList: [], tags: [], categories: [], count: 0, current: 1, recentArticle: [] } // will be passed to the page component as props
+      props: { articleList: [], tags: [], categories: [], count: 0, current: 1, recentArticle: [] }, // will be passed to the page component as props
     }
   }
 }

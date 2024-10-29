@@ -1,4 +1,4 @@
-const HOST = process.env.NODE_ENV === 'development' ? 'http://localhost:9002' : ''
+const HOST = process.env.NODE_ENV === 'development' ? 'http://localhost:9002' : 'http://120.27.159.134:9002'
 
 const API = {
   getArticleList: HOST + '/api/getArticleList',

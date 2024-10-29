@@ -12,3 +12,6 @@ APlayer.js
 pm2 start yarn --name 任务名称（随便取） -- start
 
 pm2 start yarn --name blog -- start
+
+
+node 版本 14
